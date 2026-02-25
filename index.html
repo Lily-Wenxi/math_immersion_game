@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Immersion 七年级闯关</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>Math Immersion · 七年级闯关站</h1>
+      <p>
+        结合新加坡数学（CPA：具体-形象-抽象）与数学情境题。每过一关就能赚积分，逐步解锁下一关。
+      </p>
+      <div class="stats">
+        <span>当前积分：<strong id="score">0</strong></span>
+        <span>已解锁关卡：<strong id="unlocked">1</strong>/5</span>
+      </div>
+      <button id="resetProgress" class="secondary">重置进度</button>
+    </header>
+
+    <main>
+      <section class="panel" id="levelPanel">
+        <h2>关卡选择</h2>
+        <div id="levelList" class="level-list" aria-live="polite"></div>
+      </section>
+
+      <section class="panel" id="challengePanel">
+        <h2 id="levelTitle">请选择一个关卡</h2>
+        <p id="story" class="story"></p>
+
+        <div id="visualAid" class="visual-aid" aria-label="题目可视化"></div>
+
+        <label for="answerInput">输入答案：</label>
+        <input id="answerInput" type="text" placeholder="例如：24 或 3/4" />
+        <div class="actions">
+          <button id="submitAnswer">提交答案</button>
+          <button id="hintBtn" class="secondary">提示</button>
+        </div>
+
+        <p id="hint" class="hint"></p>
+        <p id="feedback" class="feedback" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <footer>
+      <p>下一步建议：完成七年级后可扩展八年级、九年级，增加代数与几何探险地图。</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

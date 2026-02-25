@@ -1,0 +1,133 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", "PingFang SC", "Noto Sans SC", sans-serif;
+  --bg: #f4f8ff;
+  --panel: #ffffff;
+  --primary: #2f67ff;
+  --accent: #ff9f1c;
+  --good: #137333;
+  --bad: #b3261e;
+  --text: #1f2937;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #edf4ff 0%, var(--bg) 100%);
+  color: var(--text);
+}
+
+.hero,
+main,
+footer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.hero h1 {
+  margin-bottom: 0.4rem;
+}
+
+.stats {
+  display: flex;
+  gap: 1rem;
+  margin: 0.75rem 0;
+  flex-wrap: wrap;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+}
+
+.panel {
+  background: var(--panel);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+  padding: 1rem;
+}
+
+.level-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.level-btn {
+  text-align: left;
+  border: 1px solid #d9e2ff;
+  border-radius: 8px;
+  padding: 0.7rem;
+  background: #f8faff;
+  cursor: pointer;
+}
+
+.level-btn.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.visual-aid {
+  min-height: 70px;
+  margin: 0.5rem 0 0.8rem;
+  padding: 0.6rem;
+  border-radius: 8px;
+  border: 1px dashed #b4c7ff;
+  background: #f5f8ff;
+}
+
+.actions {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #e5ebff;
+  color: #20326f;
+}
+
+input {
+  margin-top: 0.2rem;
+  width: 100%;
+  max-width: 280px;
+  padding: 0.55rem;
+  border-radius: 8px;
+  border: 1px solid #c8d3f5;
+}
+
+.feedback {
+  font-weight: 600;
+}
+
+.feedback.good {
+  color: var(--good);
+}
+
+.feedback.bad {
+  color: var(--bad);
+}
+
+.hint {
+  color: #525f88;
+  min-height: 1.2rem;
+}
+
+.story {
+  line-height: 1.5;
+}
+
+@media (max-width: 840px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+}
