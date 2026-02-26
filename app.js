@@ -26,13 +26,6 @@ const equipmentIcons = {
   geometry_compass: "🧭",
 };
 
-const angelaLines = [
-  "You’re doing great — one more try! 🌟",
-  "Nice effort! Let’s break it into smaller steps. ✨",
-  "Mistakes help your brain grow. Try again, champion! 💪",
-  "Angela says: breathe, then solve it slowly. You got this! 💖",
-];
-
 const scoreEl = document.getElementById("score");
 const unlockedEl = document.getElementById("unlocked");
 const totalLevelsEl = document.getElementById("totalLevels");
@@ -56,7 +49,6 @@ const levelPanelTitleEl = document.getElementById("levelPanelTitle");
 const shopListEl = document.getElementById("shopList");
 const inventoryListEl = document.getElementById("inventoryList");
 const shopMessageEl = document.getElementById("shopMessage");
-const soundToggleEl = document.getElementById("soundToggle");
 const angelaBubbleEl = document.getElementById("angelaBubble");
 const angelaTextEl = document.getElementById("angelaText");
 
@@ -69,7 +61,6 @@ function storageKey() {
 }
 
 function playTone(freq, duration = 0.16) {
-  if (!soundToggleEl?.checked) return;
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) return;
   const ctx = new AudioCtx();
@@ -359,10 +350,6 @@ function renderReinforcement() {
   });
 }
 
-function randomAngelaLine() {
-  return angelaLines[Math.floor(Math.random() * angelaLines.length)];
-}
-
 function submitAnswer() {
   if (!state.selectedLevel) return;
   const correct = isAnswerCorrect(answerInputEl.value, state.selectedLevel.answers);
@@ -373,7 +360,7 @@ function submitAnswer() {
       ? "🎉 Correct! You already cleared this level — keep the streak!"
       : `🎉 Correct! +${state.selectedLevel.points} pts`;
     feedbackEl.className = "feedback good";
-    hideAngela();
+    showAngela("Congratulations! 🎉");
     playCorrectSound();
 
     if (!alreadyCompleted) {
@@ -389,7 +376,7 @@ function submitAnswer() {
   } else {
     feedbackEl.textContent = "Not quite yet. Added to Mistake Book for targeted practice.";
     feedbackEl.className = "feedback bad";
-    showAngela(randomAngelaLine());
+    showAngela("keep going~!");
     playIncorrectSound();
     addMistake(answerInputEl.value);
   }
