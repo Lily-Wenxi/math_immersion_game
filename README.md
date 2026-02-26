@@ -1,28 +1,40 @@
-# Math Immersion Game（七年级原型 · v2）
+# Math Immersion Game (Middle School Prototype)
 
-这是一个面向中学阶段的数学闯关 Web 应用原型，当前聚焦七年级，结合：
-- 新加坡数学 CPA（具体-形象-抽象）
-- AMC 风格改编题（非原题照搬）
-- 游戏化机制（闯关、积分、解锁、错题复盘）
+A lightweight web app for grades 7-9 that combines:
+- Singapore Math CPA (Concrete-Pictorial-Abstract)
+- AMC-style adapted practice questions
+- Gamified flow (levels, points, unlocks, mistake review, reinforcement)
 
-## 本次优化内容
+## Features
 
-- 关卡从 5 关升级到 7 关，题目更接近竞赛思维训练（比例、分数、绝对值、方程、几何、余数、计数）。
-- 增加错题本：错误答案自动记录，支持清空。
-- 增加解析按钮：每关可查看解题过程。
-- 优化界面：进度条、关卡状态标识、三栏信息展示。
-- 增强答案判定：支持部分分数/小数等价形式（如 `2/3` 与 `0.666...` 的数值比对）。
+- 7 levels per grade (currently Grade 7, 8, 9)
+- Grade switcher with separate local progress per grade
+- Mistake Book that records wrong attempts
+- 3-question same-topic reinforcement practice from mistakes
+- Hints and full solutions for each question
+- Flexible answer checking (direct match + numeric equivalence)
 
-## 本地运行
+## Run locally
 
 ```bash
 python3 -m http.server 8000
 ```
 
-打开：`http://localhost:8000/index.html`
+Open: `http://localhost:8000/index.html`
 
-## 下一步建议
+## Unit tests
 
-- 按年级拆分题库（7-12 年级）并做难度分层。
-- 对接真实 AMC 历年题做“授权后导入”或“同构改编题”训练模式。
-- 增加错题重练（按知识点自动出 3 道相似题）。
+```bash
+node --test tests/gameLogic.test.js tests/reinforcement.test.js tests/curriculum.test.js
+```
+
+Covered modules:
+- answer normalization/parsing/checking
+- reinforcement question generation
+- curriculum grade loading and isolation
+
+## Next steps
+
+- Extend curriculum to grades 10-12 with progressive difficulty
+- Add authorized historical contest datasets
+- Add "mistake retry sets" by knowledge point

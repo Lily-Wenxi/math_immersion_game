@@ -1,90 +1,18 @@
-const STORAGE_KEY = "mathImmersionGrade7v2";
+const STORAGE_PREFIX = "mathImmersionGrade";
 
-const levels = [
-  {
-    id: 1,
-    title: "关卡 1：比与缩放（AMC 风格改编）",
-    story:
-      "一种果汁配比为果浆:苏打水 = 2:5。要做 42 杯混合饮料，需要多少杯果浆？",
-    visualAid: "比例条：总份数 2+5=7，每份 = 42÷7。",
-    answers: ["12"],
-    hint: "先算每份多少杯，再乘以果浆的 2 份。",
-    solution: "总共 7 份，42÷7=6，每份 6 杯，果浆需要 2×6=12 杯。",
-    points: 15,
-  },
-  {
-    id: 2,
-    title: "关卡 2：分数路径（AMC 风格改编）",
-    story:
-      "小队先走完全程的 1/3，再走剩余路程的 1/2。此时已走全程的几分之几？",
-    visualAid: "先用 1 减去 1/3 得剩余，再取剩余的一半。",
-    answers: ["2/3"],
-    hint: "第一段后剩 2/3，再走其中一半。",
-    solution: "第一段走 1/3，剩 2/3。第二段走 (1/2)×(2/3)=1/3，总共走 1/3+1/3=2/3。",
-    points: 15,
-  },
-  {
-    id: 3,
-    title: "关卡 3：整数与绝对值（AMC 风格改编）",
-    story:
-      "若 x=-4，y=3，求 |x-y| + |x+y| 的值。",
-    visualAid: "先分别算 x-y 与 x+y，再取绝对值。",
-    answers: ["8"],
-    hint: "x-y=-7，x+y=-1。",
-    solution: "|x-y|=|-7|=7，|x+y|=|-1|=1，和为 8。",
-    points: 15,
-  },
-  {
-    id: 4,
-    title: "关卡 4：一元一次方程（AMC 风格改编）",
-    story: "若 3(x-2)+5=2x+9，求 x。",
-    visualAid: "展开括号后把 x 项放一边，常数项放另一边。",
-    answers: ["10"],
-    hint: "3x-6+5=2x+9。",
-    solution: "3x-1=2x+9，所以 x=10。",
-    points: 20,
-  },
-  {
-    id: 5,
-    title: "关卡 5：几何周长（AMC 风格改编）",
-    story:
-      "长方形长比宽多 5，且周长是 34。求长和宽分别是多少？答案格式：长,宽",
-    visualAid: "设宽为 w，则长为 w+5，用周长公式建立方程。",
-    answers: ["11,6", "11，6"],
-    hint: "2[(w+5)+w]=34。",
-    solution: "2(2w+5)=34=>4w+10=34=>w=6，长=11。",
-    points: 20,
-  },
-  {
-    id: 6,
-    title: "关卡 6：数论余数（AMC 风格改编）",
-    story:
-      "一个正整数 n 除以 7 余 3。问 2n+1 除以 7 的余数是多少？",
-    visualAid: "把 n 写成 7k+3，代入 2n+1。",
-    answers: ["0"],
-    hint: "2(7k+3)+1 = 14k+7。",
-    solution: "2n+1 = 14k+7 = 7(2k+1)，所以余数是 0。",
-    points: 25,
-  },
-  {
-    id: 7,
-    title: "关卡 7：计数策略（AMC 风格改编）",
-    story:
-      "用数字 1,2,3,4 组成两位数（可重复），其中个位大于十位的有多少个？",
-    visualAid: "按十位分类计数：十位为 1/2/3/4 时分别有多少选择。",
-    answers: ["6"],
-    hint: "十位是 1 时个位可选 2,3,4。",
-    solution: "十位为1有3种，十位为2有2种，十位为3有1种，十位为4有0种，总计6。",
-    points: 30,
-  },
-];
+const { isAnswerCorrect } = window.GameLogic;
+const { generateQuestionsByTopic } = window.Reinforcement;
+const { getSupportedGrades, getLevelsByGrade } = window.Curriculum;
 
 const state = {
+  currentGrade: 7,
   unlockedLevel: 1,
   score: 0,
   selectedLevel: null,
   completed: [],
   mistakes: [],
+  masteredTopics: [],
+  reinforcement: null,
 };
 
 const scoreEl = document.getElementById("score");
@@ -101,50 +29,35 @@ const feedbackEl = document.getElementById("feedback");
 const hintEl = document.getElementById("hint");
 const solutionEl = document.getElementById("solution");
 const mistakeListEl = document.getElementById("mistakeList");
+const reinforcementBoxEl = document.getElementById("reinforcementBox");
+const reinforcementTitleEl = document.getElementById("reinforcementTitle");
+const reinforcementListEl = document.getElementById("reinforcementList");
+const gradeSelectEl = document.getElementById("gradeSelect");
+const levelPanelTitleEl = document.getElementById("levelPanelTitle");
 
-function normalizeAnswer(value) {
-  return value.replace(/\s+/g, "").toLowerCase();
+function currentLevels() {
+  return getLevelsByGrade(state.currentGrade);
 }
 
-function parseFractionOrNumber(value) {
-  const normalized = normalizeAnswer(value);
-  if (!normalized) return null;
-
-  if (normalized.includes("/")) {
-    const parts = normalized.split("/");
-    if (parts.length !== 2) return null;
-    const numerator = Number(parts[0]);
-    const denominator = Number(parts[1]);
-    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) {
-      return null;
-    }
-    return numerator / denominator;
-  }
-
-  const numeric = Number(normalized.replace("，", ","));
-  return Number.isFinite(numeric) ? numeric : null;
+function storageKey() {
+  return `${STORAGE_PREFIX}${state.currentGrade}`;
 }
 
-function isAnswerCorrect(userInput, acceptedAnswers) {
-  const normalizedInput = normalizeAnswer(userInput);
-  if (!normalizedInput) return false;
-
-  const directMatch = acceptedAnswers.some(
-    (answer) => normalizeAnswer(answer) === normalizedInput
-  );
-  if (directMatch) return true;
-
-  const userNumber = parseFractionOrNumber(userInput);
-  if (userNumber === null) return false;
-
-  return acceptedAnswers.some((answer) => {
-    const target = parseFractionOrNumber(answer);
-    return target !== null && Math.abs(target - userNumber) < 1e-9;
-  });
+function resetTransientUI() {
+  state.selectedLevel = null;
+  state.reinforcement = null;
+  levelTitleEl.textContent = "Choose a level";
+  storyEl.textContent = "";
+  visualAidEl.textContent = "";
+  hintEl.textContent = "";
+  solutionEl.textContent = "";
+  feedbackEl.textContent = "";
+  feedbackEl.className = "feedback";
+  answerInputEl.value = "";
 }
 
 function loadState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
+  const raw = localStorage.getItem(storageKey());
   if (!raw) return;
 
   try {
@@ -153,33 +66,37 @@ function loadState() {
     state.score = parsed.score || 0;
     state.completed = Array.isArray(parsed.completed) ? parsed.completed : [];
     state.mistakes = Array.isArray(parsed.mistakes) ? parsed.mistakes : [];
+    state.masteredTopics = Array.isArray(parsed.masteredTopics) ? parsed.masteredTopics : [];
   } catch {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(storageKey());
   }
 }
 
 function saveState() {
   localStorage.setItem(
-    STORAGE_KEY,
+    storageKey(),
     JSON.stringify({
       unlockedLevel: state.unlockedLevel,
       score: state.score,
       completed: state.completed,
       mistakes: state.mistakes,
+      masteredTopics: state.masteredTopics,
     })
   );
 }
 
 function renderStats() {
+  const levels = currentLevels();
   scoreEl.textContent = state.score;
   unlockedEl.textContent = state.unlockedLevel;
   totalLevelsEl.textContent = levels.length;
   mistakeCountEl.textContent = state.mistakes.length;
-  const completedRatio = (state.completed.length / levels.length) * 100;
+  const completedRatio = levels.length ? (state.completed.length / levels.length) * 100 : 0;
   progressBarEl.style.width = `${Math.max(4, completedRatio)}%`;
 }
 
 function renderLevels() {
+  const levels = currentLevels();
   levelListEl.innerHTML = "";
 
   levels.forEach((level) => {
@@ -196,20 +113,21 @@ function renderLevels() {
       btn.classList.add("active");
     }
 
+    const mastered = state.masteredTopics.includes(level.topic) ? "🏅 Mastered" : "";
     const status = state.completed.includes(level.id)
-      ? "✅ 已完成"
+      ? "✅ Cleared"
       : locked
-      ? "🔒 未解锁"
-      : "🟡 可挑战";
+      ? "🔒 Locked"
+      : "🟡 Available";
 
-    btn.innerHTML = `<strong>${level.title}</strong><div class="meta">${status} · 奖励 ${level.points} 分</div>`;
+    btn.innerHTML = `<strong>${level.title}</strong><div class="meta">${status} ${mastered} · Reward ${level.points} pts</div>`;
     btn.addEventListener("click", () => selectLevel(level.id));
     levelListEl.appendChild(btn);
   });
 }
 
 function selectLevel(levelId) {
-  const level = levels.find((item) => item.id === levelId);
+  const level = currentLevels().find((item) => item.id === levelId);
   if (!level || level.id > state.unlockedLevel) return;
 
   state.selectedLevel = level;
@@ -229,10 +147,11 @@ function addMistake(userAnswer) {
 
   state.mistakes.unshift({
     levelId: state.selectedLevel.id,
+    topic: state.selectedLevel.topic,
     title: state.selectedLevel.title,
-    wrongAnswer: userAnswer || "(空)",
+    wrongAnswer: userAnswer || "(empty)",
     expected: state.selectedLevel.answers[0],
-    time: new Date().toLocaleString("zh-CN"),
+    time: new Date().toLocaleString(),
   });
 
   if (state.mistakes.length > 40) {
@@ -244,20 +163,112 @@ function addMistake(userAnswer) {
   renderMistakes();
 }
 
+function startReinforcement(topic, title) {
+  state.reinforcement = {
+    topic,
+    title,
+    questions: generateQuestionsByTopic(topic, 3),
+    solved: {},
+    shown: {},
+  };
+  renderReinforcement();
+}
+
 function renderMistakes() {
   mistakeListEl.innerHTML = "";
 
   if (state.mistakes.length === 0) {
     const li = document.createElement("li");
-    li.textContent = "暂无错题，继续保持！";
+    li.textContent = "No mistakes yet. Keep going!";
     mistakeListEl.appendChild(li);
     return;
   }
 
   state.mistakes.forEach((item) => {
     const li = document.createElement("li");
-    li.textContent = `[${item.time}] ${item.title}｜你的答案：${item.wrongAnswer}｜参考答案：${item.expected}`;
+    const mastered = state.masteredTopics.includes(item.topic) ? "🏅 Topic mastered" : "";
+    li.innerHTML = `[${item.time}] ${item.title} | Your answer: ${item.wrongAnswer} | Correct answer: ${item.expected}
+      <div class="mistake-actions">
+        <button class="secondary mini reinforce-btn" data-topic="${item.topic}" data-title="${item.title}">Generate 3 same-topic drills</button>
+        <span class="muted">${mastered}</span>
+      </div>`;
     mistakeListEl.appendChild(li);
+  });
+
+  document.querySelectorAll(".reinforce-btn").forEach((btn) => {
+    btn.addEventListener("click", () => startReinforcement(btn.dataset.topic, btn.dataset.title));
+  });
+}
+
+function renderReinforcement() {
+  reinforcementListEl.innerHTML = "";
+
+  if (!state.reinforcement) {
+    reinforcementBoxEl.classList.add("hidden");
+    return;
+  }
+
+  reinforcementBoxEl.classList.remove("hidden");
+  reinforcementTitleEl.textContent = `Reinforcement: ${state.reinforcement.title}`;
+
+  state.reinforcement.questions.forEach((question, index) => {
+    const wrap = document.createElement("li");
+    const solved = state.reinforcement.solved[question.id] === true;
+    const shown = state.reinforcement.shown[question.id] === true;
+
+    wrap.innerHTML = `
+      <p><strong>Q${index + 1}:</strong> ${question.prompt}</p>
+      <input type="text" id="re-answer-${question.id}" placeholder="Type your answer" />
+      <button class="mini" data-check="${question.id}">Check</button>
+      <button class="secondary mini" data-show="${question.id}">Show solution</button>
+      <p id="re-feedback-${question.id}" class="feedback ${solved ? "good" : ""}">${solved ? "Correct ✅" : ""}</p>
+      <p class="hint">${shown ? `Solution: ${question.solution}` : ""}</p>
+    `;
+    reinforcementListEl.appendChild(wrap);
+  });
+
+  const solvedCount = Object.values(state.reinforcement.solved).filter(Boolean).length;
+  const tip = document.createElement("li");
+  tip.className = "muted";
+  tip.textContent = `Progress: ${solvedCount}/3. Finish all to mark this topic as mastered.`;
+  reinforcementListEl.appendChild(tip);
+
+  reinforcementListEl.querySelectorAll("button[data-check]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.check;
+      const question = state.reinforcement.questions.find((q) => q.id === id);
+      if (!question) return;
+
+      const input = document.getElementById(`re-answer-${id}`);
+      const feedback = document.getElementById(`re-feedback-${id}`);
+      const ok = isAnswerCorrect(input.value, question.answers);
+
+      if (ok) {
+        state.reinforcement.solved[id] = true;
+        feedback.textContent = "Correct ✅";
+        feedback.className = "feedback good";
+      } else {
+        feedback.textContent = `Not yet. Hint: ${question.hint}`;
+        feedback.className = "feedback bad";
+      }
+
+      const allSolved = state.reinforcement.questions.every((q) => state.reinforcement.solved[q.id]);
+      if (allSolved && !state.masteredTopics.includes(state.reinforcement.topic)) {
+        state.masteredTopics.push(state.reinforcement.topic);
+        saveState();
+        renderLevels();
+        renderMistakes();
+      }
+
+      renderReinforcement();
+    });
+  });
+
+  reinforcementListEl.querySelectorAll("button[data-show]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.reinforcement.shown[btn.dataset.show] = true;
+      renderReinforcement();
+    });
   });
 }
 
@@ -265,29 +276,26 @@ function submitAnswer() {
   if (!state.selectedLevel) return;
 
   const userAnswer = answerInputEl.value;
-  const isCorrect = isAnswerCorrect(userAnswer, state.selectedLevel.answers);
+  const correct = isAnswerCorrect(userAnswer, state.selectedLevel.answers);
 
-  if (isCorrect) {
+  if (correct) {
     const alreadyCompleted = state.completed.includes(state.selectedLevel.id);
-
     feedbackEl.textContent = alreadyCompleted
-      ? "你之前已经通过该关卡，可以继续冲更高分。"
-      : `回答正确！+${state.selectedLevel.points} 分`;
+      ? "This level is already cleared. Keep pushing your score!"
+      : `Correct! +${state.selectedLevel.points} pts`;
     feedbackEl.className = "feedback good";
 
     if (!alreadyCompleted) {
+      const levels = currentLevels();
       state.completed.push(state.selectedLevel.id);
       state.score += state.selectedLevel.points;
-      state.unlockedLevel = Math.max(
-        state.unlockedLevel,
-        Math.min(levels.length, state.selectedLevel.id + 1)
-      );
+      state.unlockedLevel = Math.max(state.unlockedLevel, Math.min(levels.length, state.selectedLevel.id + 1));
       saveState();
       renderStats();
       renderLevels();
     }
   } else {
-    feedbackEl.textContent = "答案不正确，已加入错题本。建议先看提示再重做。";
+    feedbackEl.textContent = "Incorrect. Added to Mistake Book. Try reinforcement drills for this topic.";
     feedbackEl.className = "feedback bad";
     addMistake(userAnswer);
   }
@@ -295,39 +303,70 @@ function submitAnswer() {
 
 function showHint() {
   if (!state.selectedLevel) return;
-  hintEl.textContent = `提示：${state.selectedLevel.hint}`;
+  hintEl.textContent = `Hint: ${state.selectedLevel.hint}`;
 }
 
 function showSolution() {
   if (!state.selectedLevel) return;
-  solutionEl.textContent = `解析：${state.selectedLevel.solution}`;
+  solutionEl.textContent = `Solution: ${state.selectedLevel.solution}`;
 }
 
 function clearMistakes() {
   state.mistakes = [];
+  state.reinforcement = null;
   saveState();
   renderStats();
   renderMistakes();
+  renderReinforcement();
 }
 
 function resetProgress() {
   state.unlockedLevel = 1;
   state.score = 0;
-  state.selectedLevel = null;
   state.completed = [];
   state.mistakes = [];
-  localStorage.removeItem(STORAGE_KEY);
-
+  state.masteredTopics = [];
+  localStorage.removeItem(storageKey());
+  resetTransientUI();
   renderStats();
   renderLevels();
   renderMistakes();
-  levelTitleEl.textContent = "请选择一个关卡";
-  storyEl.textContent = "";
-  visualAidEl.textContent = "";
-  hintEl.textContent = "";
-  solutionEl.textContent = "";
-  feedbackEl.textContent = "";
-  feedbackEl.className = "feedback";
+  renderReinforcement();
+}
+
+function switchGrade(grade) {
+  state.currentGrade = grade;
+  levelPanelTitleEl.textContent = `Levels (Grade ${grade})`;
+  state.unlockedLevel = 1;
+  state.score = 0;
+  state.completed = [];
+  state.mistakes = [];
+  state.masteredTopics = [];
+  loadState();
+  resetTransientUI();
+  renderStats();
+  renderLevels();
+  renderMistakes();
+  renderReinforcement();
+  selectLevel(1);
+}
+
+function initGradeSelector() {
+  const grades = getSupportedGrades();
+  levelPanelTitleEl.textContent = `Levels (Grade ${state.currentGrade})`;
+  gradeSelectEl.innerHTML = "";
+
+  grades.forEach((grade) => {
+    const option = document.createElement("option");
+    option.value = String(grade);
+    option.textContent = `Grade ${grade}`;
+    if (grade === state.currentGrade) option.selected = true;
+    gradeSelectEl.appendChild(option);
+  });
+
+  gradeSelectEl.addEventListener("change", (event) => {
+    switchGrade(Number(event.target.value));
+  });
 }
 
 document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
@@ -340,8 +379,10 @@ answerInputEl.addEventListener("keydown", (event) => {
   if (event.key === "Enter") submitAnswer();
 });
 
+initGradeSelector();
 loadState();
 renderStats();
 renderLevels();
 renderMistakes();
+renderReinforcement();
 selectLevel(1);
