@@ -13,7 +13,11 @@ A lightweight web app for grades 7-9 that combines:
 - 3-question same-topic reinforcement practice from mistakes
 - Equipment Shop: spend earned points to buy gear
 - Sound feedback: different sounds for correct vs incorrect answers
+<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
 - Flying Fairy effect: fairy suddenly flies across the screen and speaks feedback automatically (congratulates on correct answers, says "keep going~!" on incorrect answers)
+=======
+- Fairy popup: appears with congratulations on correct answers and encouragement on incorrect answers
+>>>>>>> main
 - Hints and full solutions for each question
 - Flexible answer checking (direct match + numeric equivalence)
 
