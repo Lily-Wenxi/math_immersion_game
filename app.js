@@ -49,8 +49,8 @@ const levelPanelTitleEl = document.getElementById("levelPanelTitle");
 const shopListEl = document.getElementById("shopList");
 const inventoryListEl = document.getElementById("inventoryList");
 const shopMessageEl = document.getElementById("shopMessage");
-const angelaBubbleEl = document.getElementById("angelaBubble");
-const angelaTextEl = document.getElementById("angelaText");
+const fairyBubbleEl = document.getElementById("fairyBubble");
+const fairyTextEl = document.getElementById("fairyText");
 
 function currentLevels() {
   return getLevelsByGrade(state.currentGrade);
@@ -87,14 +87,14 @@ function playIncorrectSound() {
   playTone(240, 0.18);
 }
 
-function showAngela(line) {
-  angelaTextEl.textContent = line;
-  angelaBubbleEl.classList.remove("hidden");
+function showFairy(line) {
+  fairyTextEl.textContent = line;
+  fairyBubbleEl.classList.remove("hidden");
 }
 
-function hideAngela() {
-  angelaTextEl.textContent = "";
-  angelaBubbleEl.classList.add("hidden");
+function hideFairy() {
+  fairyTextEl.textContent = "";
+  fairyBubbleEl.classList.add("hidden");
 }
 
 function resetTransientUI() {
@@ -109,7 +109,7 @@ function resetTransientUI() {
   feedbackEl.className = "feedback";
   answerInputEl.value = "";
   shopMessageEl.textContent = "";
-  hideAngela();
+  hideFairy();
 }
 
 function loadState() {
@@ -234,7 +234,7 @@ function selectLevel(levelId) {
   feedbackEl.className = "feedback";
   hintEl.textContent = "";
   solutionEl.textContent = "";
-  hideAngela();
+  hideFairy();
   renderLevels();
 }
 
@@ -360,7 +360,7 @@ function submitAnswer() {
       ? "🎉 Correct! You already cleared this level — keep the streak!"
       : `🎉 Correct! +${state.selectedLevel.points} pts`;
     feedbackEl.className = "feedback good";
-    showAngela("Congratulations! 🎉");
+    showFairy("✨ Fairy appears: Congratulations, brilliant answer! ✨");
     playCorrectSound();
 
     if (!alreadyCompleted) {
@@ -376,7 +376,7 @@ function submitAnswer() {
   } else {
     feedbackEl.textContent = "Not quite yet. Added to Mistake Book for targeted practice.";
     feedbackEl.className = "feedback bad";
-    showAngela("keep going~!");
+    showFairy("🧚 Fairy appears: Keep going~! You are getting closer!");
     playIncorrectSound();
     addMistake(answerInputEl.value);
   }

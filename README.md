@@ -13,7 +13,7 @@ A lightweight web app for grades 7-9 that combines:
 - 3-question same-topic reinforcement practice from mistakes
 - Equipment Shop: spend earned points to buy gear
 - Sound feedback: different sounds for correct vs incorrect answers
-- Angela coach bubble: encouraging message appears on incorrect answers
+- Fairy popup: appears with congratulations on correct answers and encouragement on incorrect answers
 - Hints and full solutions for each question
 - Flexible answer checking (direct match + numeric equivalence)
 
