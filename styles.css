@@ -348,11 +348,25 @@ footer {
   margin-bottom: 0.25rem;
 }
 
-.fairy {
-  margin-top: 0.55rem;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid #f2cbe0;
-  background: #fff1f8;
-  border-radius: 12px;
-  color: #7b3e63;
+.fairy-sprite {
+  position: fixed;
+  left: -60px;
+  top: 28%;
+  font-size: 2rem;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 8px rgba(90, 60, 120, 0.25));
+}
+
+.fairy-sprite.fly {
+  animation: fairy-fly 2.2s ease-in-out forwards;
+}
+
+@keyframes fairy-fly {
+  0% { left: -60px; top: 45%; opacity: 0; transform: rotate(-8deg) scale(0.9); }
+  10% { opacity: 1; }
+  35% { top: 30%; transform: rotate(4deg) scale(1); }
+  60% { top: 38%; transform: rotate(-4deg) scale(1.05); }
+  100% { left: calc(100vw + 40px); top: 24%; opacity: 0; transform: rotate(6deg) scale(0.92); }
 }

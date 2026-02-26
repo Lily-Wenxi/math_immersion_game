@@ -49,8 +49,12 @@ const levelPanelTitleEl = document.getElementById("levelPanelTitle");
 const shopListEl = document.getElementById("shopList");
 const inventoryListEl = document.getElementById("inventoryList");
 const shopMessageEl = document.getElementById("shopMessage");
+<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
+const fairySpriteEl = document.getElementById("fairySprite");
+=======
 const fairyBubbleEl = document.getElementById("fairyBubble");
 const fairyTextEl = document.getElementById("fairyText");
+>>>>>>> main
 
 function currentLevels() {
   return getLevelsByGrade(state.currentGrade);
@@ -87,6 +91,28 @@ function playIncorrectSound() {
   playTone(240, 0.18);
 }
 
+<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
+function speakFairy(line) {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  synth.cancel();
+  const utter = new SpeechSynthesisUtterance(line);
+  utter.rate = 1;
+  utter.pitch = 1.25;
+  utter.volume = 1;
+  const voice = synth.getVoices().find((v) => /en/i.test(v.lang));
+  if (voice) utter.voice = voice;
+  synth.speak(utter);
+}
+
+function triggerFairy(line) {
+  if (fairySpriteEl) {
+    fairySpriteEl.classList.remove("fly");
+    void fairySpriteEl.offsetWidth;
+    fairySpriteEl.classList.add("fly");
+  }
+  speakFairy(line);
+=======
 function showFairy(line) {
   fairyTextEl.textContent = line;
   fairyBubbleEl.classList.remove("hidden");
@@ -95,6 +121,7 @@ function showFairy(line) {
 function hideFairy() {
   fairyTextEl.textContent = "";
   fairyBubbleEl.classList.add("hidden");
+>>>>>>> main
 }
 
 function resetTransientUI() {
@@ -109,7 +136,10 @@ function resetTransientUI() {
   feedbackEl.className = "feedback";
   answerInputEl.value = "";
   shopMessageEl.textContent = "";
+<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
+=======
   hideFairy();
+>>>>>>> main
 }
 
 function loadState() {
@@ -234,7 +264,10 @@ function selectLevel(levelId) {
   feedbackEl.className = "feedback";
   hintEl.textContent = "";
   solutionEl.textContent = "";
+<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
+=======
   hideFairy();
+>>>>>>> main
   renderLevels();
 }
 
@@ -360,7 +393,11 @@ function submitAnswer() {
       ? "🎉 Correct! You already cleared this level — keep the streak!"
       : `🎉 Correct! +${state.selectedLevel.points} pts`;
     feedbackEl.className = "feedback good";
+<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
+    triggerFairy("Congratulations!");
+=======
     showFairy("✨ Fairy appears: Congratulations, brilliant answer! ✨");
+>>>>>>> main
     playCorrectSound();
 
     if (!alreadyCompleted) {
@@ -376,7 +413,11 @@ function submitAnswer() {
   } else {
     feedbackEl.textContent = "Not quite yet. Added to Mistake Book for targeted practice.";
     feedbackEl.className = "feedback bad";
+<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
+    triggerFairy("keep going~!");
+=======
     showFairy("🧚 Fairy appears: Keep going~! You are getting closer!");
+>>>>>>> main
     playIncorrectSound();
     addMistake(answerInputEl.value);
   }
