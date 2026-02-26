@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Immersion Quest · AMC Style</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>Math Immersion · Middle School Quest</h1>
+      <p>
+        Built with Singapore Math CPA (Concrete-Pictorial-Abstract) and AMC-style adapted problems:
+        level up, earn points, unlock, and review mistakes.
+      </p>
+      <div class="grade-switch">
+        <label for="gradeSelect">Grade:</label>
+        <select id="gradeSelect" aria-label="Select grade"></select>
+      </div>
+      <div class="stats" aria-live="polite">
+        <span>Score: <strong id="score">0</strong></span>
+        <span>Unlocked Levels: <strong id="unlocked">1</strong>/<strong id="totalLevels">7</strong></span>
+        <span>Mistakes: <strong id="mistakeCount">0</strong></span>
+        <span>Equipment Owned: <strong id="equipmentCount">0</strong></span>
+      </div>
+      <div class="progress-wrap" aria-label="Level progress bar">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+      <button id="resetProgress" class="secondary">Reset Progress</button>
+    </header>
+
+    <main>
+      <section class="panel" id="levelPanel">
+        <h2 id="levelPanelTitle">Levels (Grade 7)</h2>
+        <p class="muted">First clear awards points. Levels unlock in order.</p>
+        <div id="levelList" class="level-list" aria-live="polite"></div>
+      </section>
+
+      <section class="panel" id="challengePanel">
+        <h2 id="levelTitle">Choose a level</h2>
+        <p id="story" class="story"></p>
+        <div id="visualAid" class="visual-aid" aria-label="Problem visual aid"></div>
+
+        <label for="answerInput">Your answer:</label>
+        <input id="answerInput" type="text" placeholder="e.g. 24, 5/8, 0.75" />
+
+        <div class="actions">
+          <button id="submitAnswer">Submit</button>
+          <button id="hintBtn" class="secondary">Hint</button>
+          <button id="solutionBtn" class="secondary">Solution</button>
+        </div>
+
+        <p id="hint" class="hint"></p>
+        <p id="solution" class="solution"></p>
+        <p id="feedback" class="feedback" aria-live="polite"></p>
+        <div id="fairySprite" class="fairy-sprite" aria-hidden="true">🧚</div>
+      </section>
+
+      <section class="panel" id="mistakePanel">
+        <div class="mistake-header">
+          <h2>Mistake Book</h2>
+          <button id="clearMistakes" class="secondary">Clear Mistakes</button>
+        </div>
+        <p class="muted">Wrong answers are stored here for focused review.</p>
+        <ul id="mistakeList" class="mistake-list"></ul>
+        <div id="reinforcementBox" class="reinforcement hidden">
+          <h3 id="reinforcementTitle">Reinforcement Practice</h3>
+          <ul id="reinforcementList" class="mistake-list"></ul>
+        </div>
+      </section>
+      <section class="panel" id="shopPanel">
+        <div class="mistake-header">
+          <h2>Equipment Shop</h2>
+          <span id="shopMessage" class="muted"></span>
+        </div>
+        <p class="muted">Use points from cleared levels to buy equipment.</p>
+        <div id="shopList" class="shop-grid"></div>
+        <h3>Your Equipment</h3>
+        <ul id="inventoryList" class="mistake-list"></ul>
+      </section>
+
+    </main>
+
+    <footer>
+      <p>Next: expand to grades 10-12 and connect authorized historical contest datasets.</p>
+    </footer>
+
+    <script src="gameLogic.js"></script>
+    <script src="reinforcement.js"></script>
+    <script src="curriculum.js"></script>
+    <script src="shopLogic.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
