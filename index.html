@@ -1,47 +1,52 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Math Immersion 七年级闯关 · AMC 风格</title>
+    <title>Math Immersion Quest · AMC Style</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <header class="hero">
-      <h1>Math Immersion · 七年级闯关站</h1>
+      <h1>Math Immersion · Middle School Quest</h1>
       <p>
-        基于新加坡数学 CPA（具体-形象-抽象）与 AMC 风格改编题：闯关、得分、解锁、复盘。
+        Built with Singapore Math CPA (Concrete-Pictorial-Abstract) and AMC-style adapted problems:
+        level up, earn points, unlock, and review mistakes.
       </p>
-      <div class="stats" aria-live="polite">
-        <span>当前积分：<strong id="score">0</strong></span>
-        <span>已解锁关卡：<strong id="unlocked">1</strong>/<strong id="totalLevels">7</strong></span>
-        <span>错题数：<strong id="mistakeCount">0</strong></span>
+      <div class="grade-switch">
+        <label for="gradeSelect">Grade:</label>
+        <select id="gradeSelect" aria-label="Select grade"></select>
       </div>
-      <div class="progress-wrap" aria-label="关卡进度条">
+      <div class="stats" aria-live="polite">
+        <span>Score: <strong id="score">0</strong></span>
+        <span>Unlocked Levels: <strong id="unlocked">1</strong>/<strong id="totalLevels">7</strong></span>
+        <span>Mistakes: <strong id="mistakeCount">0</strong></span>
+      </div>
+      <div class="progress-wrap" aria-label="Level progress bar">
         <div id="progressBar" class="progress-bar"></div>
       </div>
-      <button id="resetProgress" class="secondary">重置进度</button>
+      <button id="resetProgress" class="secondary">Reset Progress</button>
     </header>
 
     <main>
       <section class="panel" id="levelPanel">
-        <h2>关卡选择（七年级）</h2>
-        <p class="muted">说明：每关首次通过可获得积分，必须按顺序解锁。</p>
+        <h2 id="levelPanelTitle">Levels (Grade 7)</h2>
+        <p class="muted">First clear awards points. Levels unlock in order.</p>
         <div id="levelList" class="level-list" aria-live="polite"></div>
       </section>
 
       <section class="panel" id="challengePanel">
-        <h2 id="levelTitle">请选择一个关卡</h2>
+        <h2 id="levelTitle">Choose a level</h2>
         <p id="story" class="story"></p>
-        <div id="visualAid" class="visual-aid" aria-label="题目可视化"></div>
+        <div id="visualAid" class="visual-aid" aria-label="Problem visual aid"></div>
 
-        <label for="answerInput">输入答案：</label>
-        <input id="answerInput" type="text" placeholder="例如：24、5/8、0.75" />
+        <label for="answerInput">Your answer:</label>
+        <input id="answerInput" type="text" placeholder="e.g. 24, 5/8, 0.75" />
 
         <div class="actions">
-          <button id="submitAnswer">提交答案</button>
-          <button id="hintBtn" class="secondary">提示</button>
-          <button id="solutionBtn" class="secondary">解析</button>
+          <button id="submitAnswer">Submit</button>
+          <button id="hintBtn" class="secondary">Hint</button>
+          <button id="solutionBtn" class="secondary">Solution</button>
         </div>
 
         <p id="hint" class="hint"></p>
@@ -51,18 +56,25 @@
 
       <section class="panel" id="mistakePanel">
         <div class="mistake-header">
-          <h2>错题本</h2>
-          <button id="clearMistakes" class="secondary">清空错题本</button>
+          <h2>Mistake Book</h2>
+          <button id="clearMistakes" class="secondary">Clear Mistakes</button>
         </div>
-        <p class="muted">记录你的错误答案，便于复盘与二次练习。</p>
+        <p class="muted">Wrong answers are stored here for focused review.</p>
         <ul id="mistakeList" class="mistake-list"></ul>
+        <div id="reinforcementBox" class="reinforcement hidden">
+          <h3 id="reinforcementTitle">Reinforcement Practice</h3>
+          <ul id="reinforcementList" class="mistake-list"></ul>
+        </div>
       </section>
     </main>
 
     <footer>
-      <p>下一步建议：继续扩展八年级、九年级内容，并接入真实题库分层训练。</p>
+      <p>Next: expand to grades 10-12 and connect authorized historical contest datasets.</p>
     </footer>
 
+    <script src="gameLogic.js"></script>
+    <script src="reinforcement.js"></script>
+    <script src="curriculum.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
