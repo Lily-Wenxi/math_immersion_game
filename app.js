@@ -3,6 +3,7 @@ const STORAGE_PREFIX = "mathImmersionGrade";
 const { isAnswerCorrect } = window.GameLogic;
 const { generateQuestionsByTopic } = window.Reinforcement;
 const { getSupportedGrades, getLevelsByGrade } = window.Curriculum;
+const { getCatalog, purchaseEquipment } = window.ShopLogic;
 
 const state = {
   currentGrade: 7,
@@ -13,12 +14,16 @@ const state = {
   mistakes: [],
   masteredTopics: [],
   reinforcement: null,
+  ownedEquipment: [],
 };
+
+const shopCatalog = getCatalog();
 
 const scoreEl = document.getElementById("score");
 const unlockedEl = document.getElementById("unlocked");
 const totalLevelsEl = document.getElementById("totalLevels");
 const mistakeCountEl = document.getElementById("mistakeCount");
+const equipmentCountEl = document.getElementById("equipmentCount");
 const progressBarEl = document.getElementById("progressBar");
 const levelListEl = document.getElementById("levelList");
 const levelTitleEl = document.getElementById("levelTitle");
@@ -34,6 +39,9 @@ const reinforcementTitleEl = document.getElementById("reinforcementTitle");
 const reinforcementListEl = document.getElementById("reinforcementList");
 const gradeSelectEl = document.getElementById("gradeSelect");
 const levelPanelTitleEl = document.getElementById("levelPanelTitle");
+const shopListEl = document.getElementById("shopList");
+const inventoryListEl = document.getElementById("inventoryList");
+const shopMessageEl = document.getElementById("shopMessage");
 
 function currentLevels() {
   return getLevelsByGrade(state.currentGrade);
@@ -54,6 +62,7 @@ function resetTransientUI() {
   feedbackEl.textContent = "";
   feedbackEl.className = "feedback";
   answerInputEl.value = "";
+  shopMessageEl.textContent = "";
 }
 
 function loadState() {
@@ -67,6 +76,7 @@ function loadState() {
     state.completed = Array.isArray(parsed.completed) ? parsed.completed : [];
     state.mistakes = Array.isArray(parsed.mistakes) ? parsed.mistakes : [];
     state.masteredTopics = Array.isArray(parsed.masteredTopics) ? parsed.masteredTopics : [];
+    state.ownedEquipment = Array.isArray(parsed.ownedEquipment) ? parsed.ownedEquipment : [];
   } catch {
     localStorage.removeItem(storageKey());
   }
@@ -81,6 +91,7 @@ function saveState() {
       completed: state.completed,
       mistakes: state.mistakes,
       masteredTopics: state.masteredTopics,
+      ownedEquipment: state.ownedEquipment,
     })
   );
 }
@@ -91,8 +102,54 @@ function renderStats() {
   unlockedEl.textContent = state.unlockedLevel;
   totalLevelsEl.textContent = levels.length;
   mistakeCountEl.textContent = state.mistakes.length;
+  equipmentCountEl.textContent = state.ownedEquipment.length;
   const completedRatio = levels.length ? (state.completed.length / levels.length) * 100 : 0;
   progressBarEl.style.width = `${Math.max(4, completedRatio)}%`;
+}
+
+function renderShop() {
+  shopListEl.innerHTML = "";
+  inventoryListEl.innerHTML = "";
+
+  shopCatalog.forEach((item) => {
+    const owned = state.ownedEquipment.includes(item.id);
+    const card = document.createElement("div");
+    card.className = "shop-item";
+    card.innerHTML = `
+      <h4>${item.name}</h4>
+      <p>${item.effect}</p>
+      <p class="price">Cost: ${item.cost} pts</p>
+      <button ${owned ? "disabled" : ""} data-buy="${item.id}">${owned ? "Owned" : "Buy"}</button>
+    `;
+    shopListEl.appendChild(card);
+  });
+
+  shopListEl.querySelectorAll("button[data-buy]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const result = purchaseEquipment(state.score, state.ownedEquipment, btn.dataset.buy);
+      shopMessageEl.textContent = result.message;
+      if (result.ok) {
+        state.score = result.score;
+        state.ownedEquipment = result.owned;
+        saveState();
+        renderStats();
+      }
+      renderShop();
+    });
+  });
+
+  if (state.ownedEquipment.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No equipment yet. Clear levels to earn points and buy gear.";
+    inventoryListEl.appendChild(li);
+  } else {
+    state.ownedEquipment.forEach((id) => {
+      const item = shopCatalog.find((it) => it.id === id);
+      const li = document.createElement("li");
+      li.textContent = `${item?.name || id} — ${item?.effect || ""}`;
+      inventoryListEl.appendChild(li);
+    });
+  }
 }
 
 function renderLevels() {
@@ -109,16 +166,10 @@ function renderLevels() {
       btn.disabled = true;
     }
 
-    if (state.selectedLevel?.id === level.id) {
-      btn.classList.add("active");
-    }
+    if (state.selectedLevel?.id === level.id) btn.classList.add("active");
 
     const mastered = state.masteredTopics.includes(level.topic) ? "🏅 Mastered" : "";
-    const status = state.completed.includes(level.id)
-      ? "✅ Cleared"
-      : locked
-      ? "🔒 Locked"
-      : "🟡 Available";
+    const status = state.completed.includes(level.id) ? "✅ Cleared" : locked ? "🔒 Locked" : "🟡 Available";
 
     btn.innerHTML = `<strong>${level.title}</strong><div class="meta">${status} ${mastered} · Reward ${level.points} pts</div>`;
     btn.addEventListener("click", () => selectLevel(level.id));
@@ -144,7 +195,6 @@ function selectLevel(levelId) {
 
 function addMistake(userAnswer) {
   if (!state.selectedLevel) return;
-
   state.mistakes.unshift({
     levelId: state.selectedLevel.id,
     topic: state.selectedLevel.topic,
@@ -154,9 +204,7 @@ function addMistake(userAnswer) {
     time: new Date().toLocaleString(),
   });
 
-  if (state.mistakes.length > 40) {
-    state.mistakes = state.mistakes.slice(0, 40);
-  }
+  if (state.mistakes.length > 40) state.mistakes = state.mistakes.slice(0, 40);
 
   saveState();
   renderStats();
@@ -164,19 +212,12 @@ function addMistake(userAnswer) {
 }
 
 function startReinforcement(topic, title) {
-  state.reinforcement = {
-    topic,
-    title,
-    questions: generateQuestionsByTopic(topic, 3),
-    solved: {},
-    shown: {},
-  };
+  state.reinforcement = { topic, title, questions: generateQuestionsByTopic(topic, 3), solved: {}, shown: {} };
   renderReinforcement();
 }
 
 function renderMistakes() {
   mistakeListEl.innerHTML = "";
-
   if (state.mistakes.length === 0) {
     const li = document.createElement("li");
     li.textContent = "No mistakes yet. Keep going!";
@@ -202,7 +243,6 @@ function renderMistakes() {
 
 function renderReinforcement() {
   reinforcementListEl.innerHTML = "";
-
   if (!state.reinforcement) {
     reinforcementBoxEl.classList.add("hidden");
     return;
@@ -216,14 +256,12 @@ function renderReinforcement() {
     const solved = state.reinforcement.solved[question.id] === true;
     const shown = state.reinforcement.shown[question.id] === true;
 
-    wrap.innerHTML = `
-      <p><strong>Q${index + 1}:</strong> ${question.prompt}</p>
+    wrap.innerHTML = `<p><strong>Q${index + 1}:</strong> ${question.prompt}</p>
       <input type="text" id="re-answer-${question.id}" placeholder="Type your answer" />
       <button class="mini" data-check="${question.id}">Check</button>
       <button class="secondary mini" data-show="${question.id}">Show solution</button>
       <p id="re-feedback-${question.id}" class="feedback ${solved ? "good" : ""}">${solved ? "Correct ✅" : ""}</p>
-      <p class="hint">${shown ? `Solution: ${question.solution}` : ""}</p>
-    `;
+      <p class="hint">${shown ? `Solution: ${question.solution}` : ""}</p>`;
     reinforcementListEl.appendChild(wrap);
   });
 
@@ -238,11 +276,9 @@ function renderReinforcement() {
       const id = btn.dataset.check;
       const question = state.reinforcement.questions.find((q) => q.id === id);
       if (!question) return;
-
       const input = document.getElementById(`re-answer-${id}`);
       const feedback = document.getElementById(`re-feedback-${id}`);
       const ok = isAnswerCorrect(input.value, question.answers);
-
       if (ok) {
         state.reinforcement.solved[id] = true;
         feedback.textContent = "Correct ✅";
@@ -259,7 +295,6 @@ function renderReinforcement() {
         renderLevels();
         renderMistakes();
       }
-
       renderReinforcement();
     });
   });
@@ -274,17 +309,12 @@ function renderReinforcement() {
 
 function submitAnswer() {
   if (!state.selectedLevel) return;
-
   const userAnswer = answerInputEl.value;
   const correct = isAnswerCorrect(userAnswer, state.selectedLevel.answers);
-
   if (correct) {
     const alreadyCompleted = state.completed.includes(state.selectedLevel.id);
-    feedbackEl.textContent = alreadyCompleted
-      ? "This level is already cleared. Keep pushing your score!"
-      : `Correct! +${state.selectedLevel.points} pts`;
+    feedbackEl.textContent = alreadyCompleted ? "This level is already cleared. Keep pushing your score!" : `Correct! +${state.selectedLevel.points} pts`;
     feedbackEl.className = "feedback good";
-
     if (!alreadyCompleted) {
       const levels = currentLevels();
       state.completed.push(state.selectedLevel.id);
@@ -293,6 +323,7 @@ function submitAnswer() {
       saveState();
       renderStats();
       renderLevels();
+      renderShop();
     }
   } else {
     feedbackEl.textContent = "Incorrect. Added to Mistake Book. Try reinforcement drills for this topic.";
@@ -326,12 +357,14 @@ function resetProgress() {
   state.completed = [];
   state.mistakes = [];
   state.masteredTopics = [];
+  state.ownedEquipment = [];
   localStorage.removeItem(storageKey());
   resetTransientUI();
   renderStats();
   renderLevels();
   renderMistakes();
   renderReinforcement();
+  renderShop();
 }
 
 function switchGrade(grade) {
@@ -342,12 +375,14 @@ function switchGrade(grade) {
   state.completed = [];
   state.mistakes = [];
   state.masteredTopics = [];
+  state.ownedEquipment = [];
   loadState();
   resetTransientUI();
   renderStats();
   renderLevels();
   renderMistakes();
   renderReinforcement();
+  renderShop();
   selectLevel(1);
 }
 
@@ -355,7 +390,6 @@ function initGradeSelector() {
   const grades = getSupportedGrades();
   levelPanelTitleEl.textContent = `Levels (Grade ${state.currentGrade})`;
   gradeSelectEl.innerHTML = "";
-
   grades.forEach((grade) => {
     const option = document.createElement("option");
     option.value = String(grade);
@@ -385,4 +419,5 @@ renderStats();
 renderLevels();
 renderMistakes();
 renderReinforcement();
+renderShop();
 selectLevel(1);

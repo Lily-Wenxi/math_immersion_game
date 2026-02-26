@@ -21,6 +21,7 @@
         <span>Score: <strong id="score">0</strong></span>
         <span>Unlocked Levels: <strong id="unlocked">1</strong>/<strong id="totalLevels">7</strong></span>
         <span>Mistakes: <strong id="mistakeCount">0</strong></span>
+        <span>Equipment Owned: <strong id="equipmentCount">0</strong></span>
       </div>
       <div class="progress-wrap" aria-label="Level progress bar">
         <div id="progressBar" class="progress-bar"></div>
@@ -66,6 +67,17 @@
           <ul id="reinforcementList" class="mistake-list"></ul>
         </div>
       </section>
+      <section class="panel" id="shopPanel">
+        <div class="mistake-header">
+          <h2>Equipment Shop</h2>
+          <span id="shopMessage" class="muted"></span>
+        </div>
+        <p class="muted">Use points from cleared levels to buy equipment.</p>
+        <div id="shopList" class="shop-grid"></div>
+        <h3>Your Equipment</h3>
+        <ul id="inventoryList" class="mistake-list"></ul>
+      </section>
+
     </main>
 
     <footer>
@@ -75,6 +87,7 @@
     <script src="gameLogic.js"></script>
     <script src="reinforcement.js"></script>
     <script src="curriculum.js"></script>
+    <script src="shopLogic.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

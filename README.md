@@ -11,6 +11,7 @@ A lightweight web app for grades 7-9 that combines:
 - Grade switcher with separate local progress per grade
 - Mistake Book that records wrong attempts
 - 3-question same-topic reinforcement practice from mistakes
+- Equipment Shop: spend earned points to buy gear
 - Hints and full solutions for each question
 - Flexible answer checking (direct match + numeric equivalence)
 
@@ -25,13 +26,14 @@ Open: `http://localhost:8000/index.html`
 ## Unit tests
 
 ```bash
-node --test tests/gameLogic.test.js tests/reinforcement.test.js tests/curriculum.test.js
+node --test tests/gameLogic.test.js tests/reinforcement.test.js tests/curriculum.test.js tests/shopLogic.test.js
 ```
 
 Covered modules:
 - answer normalization/parsing/checking
 - reinforcement question generation
 - curriculum grade loading and isolation
+- shop purchase rules and point deduction
 
 ## Next steps
 
