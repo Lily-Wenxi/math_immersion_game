@@ -18,6 +18,20 @@ const state = {
 };
 
 const shopCatalog = getCatalog();
+const equipmentIcons = {
+  pencil_plus: "✏️",
+  focus_goggles: "🥽",
+  fraction_blade: "🗡️",
+  algebra_shield: "🛡️",
+  geometry_compass: "🧭",
+};
+
+const angelaLines = [
+  "You’re doing great — one more try! 🌟",
+  "Nice effort! Let’s break it into smaller steps. ✨",
+  "Mistakes help your brain grow. Try again, champion! 💪",
+  "Angela says: breathe, then solve it slowly. You got this! 💖",
+];
 
 const scoreEl = document.getElementById("score");
 const unlockedEl = document.getElementById("unlocked");
@@ -42,6 +56,9 @@ const levelPanelTitleEl = document.getElementById("levelPanelTitle");
 const shopListEl = document.getElementById("shopList");
 const inventoryListEl = document.getElementById("inventoryList");
 const shopMessageEl = document.getElementById("shopMessage");
+const soundToggleEl = document.getElementById("soundToggle");
+const angelaBubbleEl = document.getElementById("angelaBubble");
+const angelaTextEl = document.getElementById("angelaText");
 
 function currentLevels() {
   return getLevelsByGrade(state.currentGrade);
@@ -49,6 +66,44 @@ function currentLevels() {
 
 function storageKey() {
   return `${STORAGE_PREFIX}${state.currentGrade}`;
+}
+
+function playTone(freq, duration = 0.16) {
+  if (!soundToggleEl?.checked) return;
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return;
+  const ctx = new AudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = "triangle";
+  osc.frequency.value = freq;
+  gain.gain.value = 0.001;
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  const now = ctx.currentTime;
+  gain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+  osc.start(now);
+  osc.stop(now + duration);
+}
+
+function playCorrectSound() {
+  playTone(660, 0.13);
+  setTimeout(() => playTone(880, 0.16), 120);
+}
+
+function playIncorrectSound() {
+  playTone(240, 0.18);
+}
+
+function showAngela(line) {
+  angelaTextEl.textContent = line;
+  angelaBubbleEl.classList.remove("hidden");
+}
+
+function hideAngela() {
+  angelaTextEl.textContent = "";
+  angelaBubbleEl.classList.add("hidden");
 }
 
 function resetTransientUI() {
@@ -63,12 +118,12 @@ function resetTransientUI() {
   feedbackEl.className = "feedback";
   answerInputEl.value = "";
   shopMessageEl.textContent = "";
+  hideAngela();
 }
 
 function loadState() {
   const raw = localStorage.getItem(storageKey());
   if (!raw) return;
-
   try {
     const parsed = JSON.parse(raw);
     state.unlockedLevel = Math.max(1, parsed.unlockedLevel || 1);
@@ -116,6 +171,7 @@ function renderShop() {
     const card = document.createElement("div");
     card.className = "shop-item";
     card.innerHTML = `
+      <div class="icon" aria-hidden="true">${equipmentIcons[item.id] || "🎒"}</div>
       <h4>${item.name}</h4>
       <p>${item.effect}</p>
       <p class="price">Cost: ${item.cost} pts</p>
@@ -133,6 +189,9 @@ function renderShop() {
         state.ownedEquipment = result.owned;
         saveState();
         renderStats();
+        playCorrectSound();
+      } else {
+        playIncorrectSound();
       }
       renderShop();
     });
@@ -146,31 +205,26 @@ function renderShop() {
     state.ownedEquipment.forEach((id) => {
       const item = shopCatalog.find((it) => it.id === id);
       const li = document.createElement("li");
-      li.textContent = `${item?.name || id} — ${item?.effect || ""}`;
+      li.textContent = `${equipmentIcons[id] || "🎒"} ${item?.name || id} — ${item?.effect || ""}`;
       inventoryListEl.appendChild(li);
     });
   }
 }
 
 function renderLevels() {
-  const levels = currentLevels();
   levelListEl.innerHTML = "";
-
-  levels.forEach((level) => {
+  currentLevels().forEach((level) => {
     const btn = document.createElement("button");
     btn.className = "level-btn";
     const locked = level.id > state.unlockedLevel;
-
     if (locked) {
       btn.classList.add("locked");
       btn.disabled = true;
     }
-
     if (state.selectedLevel?.id === level.id) btn.classList.add("active");
 
     const mastered = state.masteredTopics.includes(level.topic) ? "🏅 Mastered" : "";
     const status = state.completed.includes(level.id) ? "✅ Cleared" : locked ? "🔒 Locked" : "🟡 Available";
-
     btn.innerHTML = `<strong>${level.title}</strong><div class="meta">${status} ${mastered} · Reward ${level.points} pts</div>`;
     btn.addEventListener("click", () => selectLevel(level.id));
     levelListEl.appendChild(btn);
@@ -180,7 +234,6 @@ function renderLevels() {
 function selectLevel(levelId) {
   const level = currentLevels().find((item) => item.id === levelId);
   if (!level || level.id > state.unlockedLevel) return;
-
   state.selectedLevel = level;
   levelTitleEl.textContent = level.title;
   storyEl.textContent = level.story;
@@ -190,6 +243,7 @@ function selectLevel(levelId) {
   feedbackEl.className = "feedback";
   hintEl.textContent = "";
   solutionEl.textContent = "";
+  hideAngela();
   renderLevels();
 }
 
@@ -203,9 +257,7 @@ function addMistake(userAnswer) {
     expected: state.selectedLevel.answers[0],
     time: new Date().toLocaleString(),
   });
-
   if (state.mistakes.length > 40) state.mistakes = state.mistakes.slice(0, 40);
-
   saveState();
   renderStats();
   renderMistakes();
@@ -255,7 +307,6 @@ function renderReinforcement() {
     const wrap = document.createElement("li");
     const solved = state.reinforcement.solved[question.id] === true;
     const shown = state.reinforcement.shown[question.id] === true;
-
     wrap.innerHTML = `<p><strong>Q${index + 1}:</strong> ${question.prompt}</p>
       <input type="text" id="re-answer-${question.id}" placeholder="Type your answer" />
       <button class="mini" data-check="${question.id}">Check</button>
@@ -273,19 +324,20 @@ function renderReinforcement() {
 
   reinforcementListEl.querySelectorAll("button[data-check]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.dataset.check;
-      const question = state.reinforcement.questions.find((q) => q.id === id);
+      const question = state.reinforcement.questions.find((q) => q.id === btn.dataset.check);
       if (!question) return;
-      const input = document.getElementById(`re-answer-${id}`);
-      const feedback = document.getElementById(`re-feedback-${id}`);
+      const input = document.getElementById(`re-answer-${btn.dataset.check}`);
+      const feedback = document.getElementById(`re-feedback-${btn.dataset.check}`);
       const ok = isAnswerCorrect(input.value, question.answers);
       if (ok) {
-        state.reinforcement.solved[id] = true;
+        state.reinforcement.solved[btn.dataset.check] = true;
         feedback.textContent = "Correct ✅";
         feedback.className = "feedback good";
+        playCorrectSound();
       } else {
         feedback.textContent = `Not yet. Hint: ${question.hint}`;
         feedback.className = "feedback bad";
+        playIncorrectSound();
       }
 
       const allSolved = state.reinforcement.questions.every((q) => state.reinforcement.solved[q.id]);
@@ -307,14 +359,23 @@ function renderReinforcement() {
   });
 }
 
+function randomAngelaLine() {
+  return angelaLines[Math.floor(Math.random() * angelaLines.length)];
+}
+
 function submitAnswer() {
   if (!state.selectedLevel) return;
-  const userAnswer = answerInputEl.value;
-  const correct = isAnswerCorrect(userAnswer, state.selectedLevel.answers);
+  const correct = isAnswerCorrect(answerInputEl.value, state.selectedLevel.answers);
+
   if (correct) {
     const alreadyCompleted = state.completed.includes(state.selectedLevel.id);
-    feedbackEl.textContent = alreadyCompleted ? "This level is already cleared. Keep pushing your score!" : `Correct! +${state.selectedLevel.points} pts`;
+    feedbackEl.textContent = alreadyCompleted
+      ? "🎉 Correct! You already cleared this level — keep the streak!"
+      : `🎉 Correct! +${state.selectedLevel.points} pts`;
     feedbackEl.className = "feedback good";
+    hideAngela();
+    playCorrectSound();
+
     if (!alreadyCompleted) {
       const levels = currentLevels();
       state.completed.push(state.selectedLevel.id);
@@ -326,9 +387,11 @@ function submitAnswer() {
       renderShop();
     }
   } else {
-    feedbackEl.textContent = "Incorrect. Added to Mistake Book. Try reinforcement drills for this topic.";
+    feedbackEl.textContent = "Not quite yet. Added to Mistake Book for targeted practice.";
     feedbackEl.className = "feedback bad";
-    addMistake(userAnswer);
+    showAngela(randomAngelaLine());
+    playIncorrectSound();
+    addMistake(answerInputEl.value);
   }
 }
 
@@ -387,20 +450,16 @@ function switchGrade(grade) {
 }
 
 function initGradeSelector() {
-  const grades = getSupportedGrades();
   levelPanelTitleEl.textContent = `Levels (Grade ${state.currentGrade})`;
   gradeSelectEl.innerHTML = "";
-  grades.forEach((grade) => {
+  getSupportedGrades().forEach((grade) => {
     const option = document.createElement("option");
     option.value = String(grade);
     option.textContent = `Grade ${grade}`;
     if (grade === state.currentGrade) option.selected = true;
     gradeSelectEl.appendChild(option);
   });
-
-  gradeSelectEl.addEventListener("change", (event) => {
-    switchGrade(Number(event.target.value));
-  });
+  gradeSelectEl.addEventListener("change", (event) => switchGrade(Number(event.target.value)));
 }
 
 document.getElementById("submitAnswer").addEventListener("click", submitAnswer);
@@ -408,10 +467,7 @@ document.getElementById("hintBtn").addEventListener("click", showHint);
 document.getElementById("solutionBtn").addEventListener("click", showSolution);
 document.getElementById("clearMistakes").addEventListener("click", clearMistakes);
 document.getElementById("resetProgress").addEventListener("click", resetProgress);
-
-answerInputEl.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") submitAnswer();
-});
+answerInputEl.addEventListener("keydown", (event) => { if (event.key === "Enter") submitAnswer(); });
 
 initGradeSelector();
 loadState();
