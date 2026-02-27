@@ -126,8 +126,8 @@ function renderCard() {
   flashWordEl.textContent = card.word;
   flashMeaningEl.textContent = `Meaning: ${card.definition}`;
   flashUsageEl.textContent = `Usage: ${card.usage}`;
-  flashSynonymEl.textContent = (card.synonymForms || [card.synonym]).join(", ");
-  flashAntonymEl.textContent = (card.antonymForms || [card.antonym]).join(", ");
+  flashSynonymEl.textContent = card.synonym;
+  flashAntonymEl.textContent = card.antonym;
   comicStripEl.innerHTML = "";
   if (mwLinkEl) mwLinkEl.href = card.dictionaryUrl || `https://www.merriam-webster.com/dictionary/${encodeURIComponent(card.word)}`;
   renderComicArt(card);

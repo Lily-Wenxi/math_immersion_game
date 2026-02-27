@@ -36,54 +36,105 @@
     return idxs.map((i) => ({ ...wordBank[i] }));
   }
 
-  function wordForms(word) {
-    const forms = [word];
-    if (!word.endsWith("s")) forms.push(`${word}s`);
-    if (!word.endsWith("ed")) forms.push(`${word}ed`);
-    if (!word.endsWith("ing")) forms.push(`${word}ing`);
-    if (!word.endsWith("ly")) forms.push(`${word}ly`);
-    if (!word.endsWith("ness")) forms.push(`${word}ness`);
-    return [...new Set(forms)].slice(0, 5);
-  }
-
-  function inferAntonym(baseWord) {
-    const prefixes = ["un", "in", "im", "ir", "non", "dis"];
-    const lower = baseWord.toLowerCase();
-    for (const prefix of prefixes) {
-      if (!lower.startsWith(prefix) && lower.length > 4) {
-        return `${prefix}${lower}`;
-      }
-    }
-    return `not-${lower}`;
-  }
+  const ANTONYM_MAP = {
+    abundant: "scarce",
+    adapt: "resist",
+    adept: "clumsy",
+    amiable: "hostile",
+    apparent: "obscure",
+    ardent: "apathetic",
+    audacious: "timid",
+    authentic: "fake",
+    benevolent: "malevolent",
+    candid: "deceptive",
+    chaotic: "orderly",
+    coherent: "confused",
+    conceal: "reveal",
+    credible: "implausible",
+    daunt: "encourage",
+    diligent: "lazy",
+    disclose: "conceal",
+    diverse: "uniform",
+    dormant: "active",
+    dynamic: "static",
+    elated: "dejected",
+    elusive: "obvious",
+    eminent: "unknown",
+    endure: "quit",
+    enhance: "weaken",
+    explicit: "vague",
+    frugal: "wasteful",
+    genuine: "counterfeit",
+    hostile: "friendly",
+    impartial: "biased",
+    imply: "state",
+    indifferent: "enthusiastic",
+    inhibit: "encourage",
+    intense: "mild",
+    lucid: "confusing",
+    meticulous: "careless",
+    novel: "ordinary",
+    obscure: "clear",
+    optimistic: "pessimistic",
+    persistent: "inconsistent",
+    precise: "inexact",
+    random: "systematic",
+    rational: "irrational",
+    relevant: "irrelevant",
+    resilient: "fragile",
+    rigid: "flexible",
+    robust: "weak",
+    scarce: "abundant",
+    skeptical: "convinced",
+    stable: "unstable",
+    substantial: "insignificant",
+    sufficient: "insufficient",
+    superficial: "profound",
+    tenacious: "yielding",
+    tentative: "certain",
+    thrive: "decline",
+    tranquil: "agitated",
+    ubiquitous: "rare",
+    ultimate: "initial",
+    validate: "refute",
+    vigilant: "careless",
+    vivid: "dull",
+  };
 
   function buildUsageSentence(wordObj) {
-    return `During the class challenge, the team used "${wordObj.word}" correctly in a real sentence.`;
+    return `During discussion, the class used "${wordObj.word}" correctly in context.`;
   }
 
   function buildComicPanels(wordObj) {
     const meaning = wordObj.definition;
     return [
-      `${wordObj.word.toUpperCase()}? I saw it in today's reading!`,
-      `It means ${meaning}. Check the context clue bubble!`,
-      `Now use it: "${wordObj.word}" in your own sentence and level up!`,
+      `I found the word "${wordObj.word}" in today's passage.`,
+      `Context clue: here it means ${meaning}.`,
+      `Now I can use "${wordObj.word}" in my own sentence!`,
     ];
   }
 
-  function normalizeWord(wordObj) {
-    const synonymBase = String(wordObj.synonym || wordObj.word).toLowerCase();
-    const antonymBase = String(wordObj.antonym || inferAntonym(synonymBase)).toLowerCase();
-    const usage = wordObj.usage || buildUsageSentence(wordObj);
+  function resolveAntonym(wordObj) {
+    const key = String(wordObj.word || "").toLowerCase();
+    const fromMap = ANTONYM_MAP[key];
+    if (fromMap) return fromMap;
 
-    const synonymForms = wordForms(synonymBase);
-    const antonymForms = wordForms(antonymBase);
+    if (wordObj.antonym && /^[a-z-]+$/i.test(wordObj.antonym)) {
+      return String(wordObj.antonym).toLowerCase();
+    }
+
+    return "(no common opposite)";
+  }
+
+  function normalizeWord(wordObj) {
+    const synonym = String(wordObj.synonym || wordObj.word || "").toLowerCase();
+    const antonym = resolveAntonym(wordObj);
+    const usage = wordObj.usage || buildUsageSentence(wordObj);
 
     return {
       ...wordObj,
-      synonym: synonymForms[0],
-      antonym: antonymForms[0],
-      synonymForms,
-      antonymForms,
+      synonym,
+      antonym,
       usage,
       comicPanels: buildComicPanels(wordObj),
       dictionaryUrl: `https://www.merriam-webster.com/dictionary/${encodeURIComponent(wordObj.word)}`,
@@ -107,8 +158,6 @@
     buildDailyDeck,
     normalizeWord,
     claimDailyReward,
-    wordForms,
-    inferAntonym,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;
