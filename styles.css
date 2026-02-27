@@ -466,3 +466,20 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+
+.word-visual {
+  margin: 0.75rem 0 0.4rem;
+}
+
+.word-visual img {
+  width: 100%;
+  border: 1px solid #d7defd;
+  border-radius: 14px;
+  display: block;
+  background: #f4f7ff;
+}
+
+.word-visual figcaption {
+  margin-top: 0.35rem;
+}

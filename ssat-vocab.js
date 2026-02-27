@@ -22,6 +22,58 @@ const choiceListEl = document.getElementById("choiceList");
 const feedbackEl = document.getElementById("vocabFeedback");
 const explainEl = document.getElementById("vocabExplain");
 const notebookListEl = document.getElementById("notebookList");
+const wordImageEl = document.getElementById("wordImage");
+const wordImageCaptionEl = document.getElementById("wordImageCaption");
+
+
+const IMAGE_HINTS = [
+  { keys: ["dry", "arid", "scarce"], icon: "🏜️" },
+  { keys: ["happy", "joy", "elated"], icon: "😄" },
+  { keys: ["calm", "tranquil"], icon: "🌊" },
+  { keys: ["strong", "robust", "endure"], icon: "💪" },
+  { keys: ["light", "bright", "vivid", "illuminate"], icon: "💡" },
+  { keys: ["friend", "amiable", "convivial", "kind"], icon: "🤝" },
+  { keys: ["study", "analyze", "scrutinize", "inspect"], icon: "🔎" },
+  { keys: ["grow", "thrive", "expand"], icon: "🌱" },
+  { keys: ["speed", "brisk", "expedite"], icon: "⚡" },
+  { keys: ["mystery", "enigmatic", "obscure"], icon: "🧩" },
+];
+
+function escapeXml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function pickImageIcon(question) {
+  const text = `${question.word} ${question.explanation}`.toLowerCase();
+  const hit = IMAGE_HINTS.find((item) => item.keys.some((k) => text.includes(k)));
+  return hit ? hit.icon : "🧠";
+}
+
+function renderWordImage(question) {
+  if (!wordImageEl || !wordImageCaptionEl) return;
+  const icon = pickImageIcon(question);
+  const line1 = question.word;
+  const line2 = question.type === "synonym" ? `Think: ${question.answer}` : "Match the definition";
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='720' height='260' viewBox='0 0 720 260'>
+    <defs>
+      <linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+        <stop offset='0%' stop-color='#f8e9ff'/>
+        <stop offset='100%' stop-color='#e8f2ff'/>
+      </linearGradient>
+    </defs>
+    <rect x='0' y='0' width='720' height='260' rx='24' fill='url(#g)'/>
+    <text x='42' y='105' font-size='70'>${icon}</text>
+    <text x='140' y='95' font-size='44' font-family='Nunito,Segoe UI,sans-serif' fill='#2c2f55' font-weight='700'>${escapeXml(line1)}</text>
+    <text x='140' y='145' font-size='28' font-family='Nunito,Segoe UI,sans-serif' fill='#4d5a8b'>${escapeXml(line2)}</text>
+  </svg>`;
+  wordImageEl.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+  wordImageCaptionEl.textContent = `Visual memory hint for “${question.word}”.`;
+}
 
 function loadState() {
   const notebookRaw = localStorage.getItem(STORAGE_KEY);
@@ -90,6 +142,8 @@ function newQuestion() {
   feedbackEl.className = "feedback";
   explainEl.textContent = "";
   choiceListEl.innerHTML = "";
+
+  renderWordImage(state.currentQuestion);
 
   state.currentQuestion.choices.forEach((choice) => {
     const btn = document.createElement("button");
