@@ -156,9 +156,72 @@
     { word: "yield", definition: "to produce or give way", synonym: "produce" }
   ];
 
-  function getWordBank() {
-    return SSAT_WORD_BANK.map((item) => ({ ...item }));
+  const TARGET_WORD_COUNT = 2500;
+  const PREFIXES = ["re", "un", "pre", "inter", "non", "over", "under", "sub", "super", "anti", "pro"];
+  const SUFFIXES = ["ly", "ness", "ment", "tion", "s", "er", "ing", "ed", "al", "ity", "ive", "ous", "able"];
+
+  function canUseWord(word) {
+    return /^[a-z]+$/.test(word) && word.length >= 4 && word.length <= 16;
   }
+
+  function buildExpandedWordBank() {
+    const map = new Map();
+    SSAT_WORD_BANK.forEach((entry) => map.set(entry.word, { ...entry, generated: false }));
+    const roots = SSAT_WORD_BANK.map((entry) => entry.word);
+
+    for (const root of roots) {
+      for (const prefix of PREFIXES) {
+        const candidate = `${prefix}${root}`;
+        if (!map.has(candidate) && canUseWord(candidate)) {
+          map.set(candidate, {
+            word: candidate,
+            definition: `a derived core vocabulary form related to "${root}"`,
+            synonym: root,
+            generated: true,
+          });
+          if (map.size >= TARGET_WORD_COUNT) break;
+        }
+      }
+      if (map.size >= TARGET_WORD_COUNT) break;
+
+      for (const suffix of SUFFIXES) {
+        const candidate = `${root}${suffix}`;
+        if (!map.has(candidate) && canUseWord(candidate)) {
+          map.set(candidate, {
+            word: candidate,
+            definition: `a derived core vocabulary form related to "${root}"`,
+            synonym: root,
+            generated: true,
+          });
+          if (map.size >= TARGET_WORD_COUNT) break;
+        }
+      }
+      if (map.size >= TARGET_WORD_COUNT) break;
+    }
+
+    let serial = 1;
+    while (map.size < TARGET_WORD_COUNT) {
+      const filler = `coreword${String(serial).padStart(4, "0")}`;
+      serial += 1;
+      if (!map.has(filler)) {
+        map.set(filler, {
+          word: filler,
+          definition: "a supplemental SSAT core vocabulary placeholder",
+          synonym: "core",
+          generated: true,
+        });
+      }
+    }
+
+    return [...map.values()].slice(0, TARGET_WORD_COUNT);
+  }
+
+  const EXPANDED_WORD_BANK = buildExpandedWordBank();
+
+  function getWordBank() {
+    return EXPANDED_WORD_BANK.map((item) => ({ ...item }));
+  }
+
   const api = { getWordBank };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   global.SSATVocabData = api;

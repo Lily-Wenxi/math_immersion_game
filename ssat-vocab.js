@@ -15,6 +15,7 @@ const qCountEl = document.getElementById("qCount");
 const correctCountEl = document.getElementById("correctCount");
 const accuracyEl = document.getElementById("accuracy");
 const notebookCountEl = document.getElementById("notebookCount");
+const bankCountEl = document.getElementById("bankCount");
 const questionTypeEl = document.getElementById("questionType");
 const questionPromptEl = document.getElementById("questionPrompt");
 const choiceListEl = document.getElementById("choiceList");
@@ -52,6 +53,7 @@ function renderStats() {
   const acc = state.stats.total ? Math.round((state.stats.correct / state.stats.total) * 100) : 0;
   accuracyEl.textContent = `${acc}%`;
   notebookCountEl.textContent = state.notebook.length;
+  bankCountEl.textContent = state.words.length;
 }
 
 function renderNotebook() {

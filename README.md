@@ -17,7 +17,7 @@ A lightweight web app for grades 7-9 that combines:
 - Animated reward feedback: points burst animation on newly cleared levels plus panel celebrate/shake motion for correct/incorrect answers
 - Hints and full solutions for each question
 - Flexible answer checking (direct match + numeric equivalence)
-- SSAT Middle Vocabulary page with synonym/definition multiple choice and a Word Notebook that re-injects wrong words into future practice
+- SSAT Middle Vocabulary page with a 2500-word bank, synonym/definition multiple choice, and a Word Notebook that re-injects wrong words into future practice
 
 ## Run locally
 

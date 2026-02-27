@@ -27,3 +27,8 @@ test('createDefinitionQuestion returns 4 choices containing answer', () => {
   assert.equal(q.choices.length, 4);
   assert.ok(q.choices.includes(q.answer));
 });
+
+
+test('word bank includes at least 2500 entries', () => {
+  assert.ok(getWordBank().length >= 2500);
+});
