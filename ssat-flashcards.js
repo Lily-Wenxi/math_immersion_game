@@ -1,6 +1,6 @@
 const { getWordBank } = window.SSATVocabData;
 const { getDeck } = window.SSATFlashcardDeck || { getDeck: null };
-const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward } = window.SSATFlashcardLogic;
+const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward, getComicScene } = window.SSATFlashcardLogic;
 
 const FLASHCARD_KEY = "ssatFlashcardDaily";
 const ACCOUNT_KEY = "ssatAccountPoints";
@@ -113,12 +113,17 @@ function renderComicArt(card) {
   const p1 = escapeXml(card.comicPanels[0] || "");
   const p2 = escapeXml(card.comicPanels[1] || "");
   const p3 = escapeXml(card.comicPanels[2] || "");
+  const scene = typeof getComicScene === "function" ? getComicScene(card) : { bg: "#f4f7ff", mood: "neutral", emoji: "🧠", prop: "💬" };
+  const eye = scene.mood === "happy" ? "◕" : scene.mood === "tense" ? "•" : "◔";
+  const mouth = scene.mood === "happy" ? "◡" : scene.mood === "tense" ? "︿" : "—";
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='300' viewBox='0 0 1000 300'>
-    <rect x='0' y='0' width='1000' height='300' rx='20' fill='#f4f7ff'/>
+    <rect x='0' y='0' width='1000' height='300' rx='20' fill='${scene.bg}'/>
+    <text x='20' y='28' font-size='22'>${scene.emoji}</text>
+    <text x='960' y='28' font-size='22'>${scene.prop}</text>
     <rect x='16' y='16' width='310' height='268' rx='12' fill='#fff'/><rect x='344' y='16' width='310' height='268' rx='12' fill='#fff'/><rect x='672' y='16' width='312' height='268' rx='12' fill='#fff'/>
-    <circle cx='70' cy='170' r='26' fill='#ffd9b3'/><rect x='54' y='198' width='32' height='56' rx='8' fill='#91b6ff'/>
-    <circle cx='400' cy='170' r='26' fill='#ffd9b3'/><rect x='384' y='198' width='32' height='56' rx='8' fill='#90d7b4'/>
-    <circle cx='728' cy='170' r='26' fill='#ffd9b3'/><rect x='712' y='198' width='32' height='56' rx='8' fill='#ffb4cb'/>
+    <circle cx='70' cy='170' r='26' fill='#ffd9b3'/><text x='58' y='176' font-size='16'>${eye}${eye}</text><text x='64' y='190' font-size='16'>${mouth}</text><rect x='54' y='198' width='32' height='56' rx='8' fill='#91b6ff'/>
+    <circle cx='400' cy='170' r='26' fill='#ffd9b3'/><text x='388' y='176' font-size='16'>${eye}${eye}</text><text x='394' y='190' font-size='16'>${mouth}</text><rect x='384' y='198' width='32' height='56' rx='8' fill='#90d7b4'/>
+    <circle cx='728' cy='170' r='26' fill='#ffd9b3'/><text x='716' y='176' font-size='16'>${eye}${eye}</text><text x='722' y='190' font-size='16'>${mouth}</text><rect x='712' y='198' width='32' height='56' rx='8' fill='#ffb4cb'/>
     <rect x='110' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='120' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p1}</text>
     <rect x='438' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='448' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p2}</text>
     <rect x='766' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='776' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p3}</text>

@@ -6,6 +6,7 @@ const {
   buildDailyDeck,
   normalizeWord,
   claimDailyReward,
+  getComicScene,
 } = require('../ssatFlashcardLogic');
 const { getWordBank } = require('../ssatVocabData');
 
@@ -36,4 +37,12 @@ test('claimDailyReward grants once per day', () => {
   const no = claimDailyReward(ok.points, true, 40);
   assert.equal(no.ok, false);
   assert.equal(no.points, 140);
+});
+
+
+test('getComicScene returns expected shape', () => {
+  const scene = getComicScene({ word: "optimistic", definition: "expecting good outcomes", synonym: "hopeful", antonym: "pessimistic" });
+  assert.ok(scene.bg);
+  assert.ok(scene.emoji);
+  assert.ok(scene.prop);
 });

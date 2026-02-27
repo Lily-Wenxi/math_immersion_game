@@ -141,6 +141,21 @@
     };
   }
 
+
+  function getComicScene(wordObj) {
+    const text = `${wordObj.word} ${wordObj.definition} ${wordObj.synonym} ${wordObj.antonym}`.toLowerCase();
+    if (/(happy|optimistic|elated|benevolent|amiable|tranquil)/.test(text)) {
+      return { bg: "#e8fff1", mood: "happy", emoji: "🌈", prop: "⭐" };
+    }
+    if (/(hostile|scarce|skeptical|difficult|adversary|chaotic)/.test(text)) {
+      return { bg: "#fff1f1", mood: "tense", emoji: "⚠️", prop: "⛰️" };
+    }
+    if (/(study|analyze|scrutinize|precise|meticulous|coherent)/.test(text)) {
+      return { bg: "#eef4ff", mood: "focus", emoji: "📘", prop: "🔎" };
+    }
+    return { bg: "#f4f7ff", mood: "neutral", emoji: "🧠", prop: "💬" };
+  }
+
   function claimDailyReward(accountPoints, alreadyClaimed, reward = 40) {
     if (alreadyClaimed) {
       return { ok: false, points: accountPoints, reward: 0, message: "Reward already claimed today." };
@@ -158,6 +173,7 @@
     buildDailyDeck,
     normalizeWord,
     claimDailyReward,
+    getComicScene,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;
