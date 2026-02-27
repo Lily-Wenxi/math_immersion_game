@@ -422,3 +422,47 @@ footer {
   75% { transform: translateX(-3px); }
   100% { transform: translateX(0); }
 }
+
+.back-link {
+  display: inline-block;
+  margin: 0.25rem 0 0.8rem;
+  color: #4e61d9;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.vocab-main {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1rem;
+}
+
+.choice-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0.8rem 0;
+}
+
+.choice-btn {
+  text-align: left;
+  background: #f8f9ff;
+  color: #2c2f55;
+  border: 1px solid #d9def7;
+}
+
+.choice-btn:hover {
+  background: #eef2ff;
+}
+
+@media (max-width: 900px) {
+  .vocab-main {
+    grid-template-columns: 1fr;
+  }
+}
