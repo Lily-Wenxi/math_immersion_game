@@ -524,3 +524,12 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+
+.comic-art {
+  width: 100%;
+  border: 1px solid #d8def9;
+  border-radius: 14px;
+  background: #eef3ff;
+  margin: 0.5rem 0 0.7rem;
+}

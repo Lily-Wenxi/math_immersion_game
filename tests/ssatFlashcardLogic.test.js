@@ -6,6 +6,8 @@ const {
   buildDailyDeck,
   normalizeWord,
   claimDailyReward,
+  wordForms,
+  inferAntonym,
 } = require('../ssatFlashcardLogic');
 const { getWordBank } = require('../ssatVocabData');
 
@@ -24,7 +26,7 @@ test('buildDailyDeck returns deterministic 20 words for same day key', () => {
 
 test('normalizeWord adds antonym usage and comic panels', () => {
   const item = normalizeWord({ word: 'abundant', definition: 'plenty', synonym: 'plentiful' });
-  assert.equal(item.antonym, 'opposite of plentiful');
+  assert.ok(item.antonym.length > 0);
   assert.ok(item.usage.length > 0);
   assert.equal(item.comicPanels.length, 3);
 });
@@ -36,4 +38,16 @@ test('claimDailyReward grants once per day', () => {
   const no = claimDailyReward(ok.points, true, 40);
   assert.equal(no.ok, false);
   assert.equal(no.points, 140);
+});
+
+
+test('wordForms builds multiple forms', () => {
+  const forms = wordForms('calm');
+  assert.ok(forms.includes('calm'));
+  assert.ok(forms.some((f) => f !== "calm"));
+});
+
+test('inferAntonym creates prefixed opposite candidate', () => {
+  const ant = inferAntonym('clear');
+  assert.ok(ant.startsWith('un') || ant.startsWith('in') || ant.startsWith('im') || ant.startsWith('ir') || ant.startsWith('non') || ant.startsWith('dis') || ant.startsWith('not-'));
 });

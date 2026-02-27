@@ -18,7 +18,7 @@ A lightweight web app for grades 7-9 that combines:
 - Hints and full solutions for each question
 - Flexible answer checking (direct match + numeric equivalence)
 - SSAT Middle Vocabulary page with a 2500-word bank, synonym/definition multiple choice, image-based visual hint cards for each word, and a Word Notebook that re-injects wrong words into future practice
-- Daily SSAT Flash Card check-in (20 words/day) with comic-style scenarios, synonym/antonym support, and daily point rewards added to the learner account
+- Daily SSAT Flash Card check-in (20 words/day) with comic-style drawn scenes, synonym/antonym word-family forms, Merriam-Webster reference links, and daily point rewards added to the learner account
 
 ## Run locally
 

@@ -36,27 +36,57 @@
     return idxs.map((i) => ({ ...wordBank[i] }));
   }
 
+  function wordForms(word) {
+    const forms = [word];
+    if (!word.endsWith("s")) forms.push(`${word}s`);
+    if (!word.endsWith("ed")) forms.push(`${word}ed`);
+    if (!word.endsWith("ing")) forms.push(`${word}ing`);
+    if (!word.endsWith("ly")) forms.push(`${word}ly`);
+    if (!word.endsWith("ness")) forms.push(`${word}ness`);
+    return [...new Set(forms)].slice(0, 5);
+  }
+
+  function inferAntonym(baseWord) {
+    const prefixes = ["un", "in", "im", "ir", "non", "dis"];
+    const lower = baseWord.toLowerCase();
+    for (const prefix of prefixes) {
+      if (!lower.startsWith(prefix) && lower.length > 4) {
+        return `${prefix}${lower}`;
+      }
+    }
+    return `not-${lower}`;
+  }
+
   function buildUsageSentence(wordObj) {
-    return `In class discussion, Mia used "${wordObj.word}" to describe the idea clearly.`;
+    return `During the class challenge, the team used "${wordObj.word}" correctly in a real sentence.`;
   }
 
   function buildComicPanels(wordObj) {
     const meaning = wordObj.definition;
     return [
-      `Panel 1: A student sees a challenge and says, "What does ${wordObj.word} mean?"`,
-      `Panel 2: A friend explains: "It means ${meaning}."`,
-      `Panel 3: They use it in context and remember it with confidence!`,
+      `${wordObj.word.toUpperCase()}? I saw it in today's reading!`,
+      `It means ${meaning}. Check the context clue bubble!`,
+      `Now use it: "${wordObj.word}" in your own sentence and level up!`,
     ];
   }
 
   function normalizeWord(wordObj) {
-    const antonym = wordObj.antonym || `opposite of ${wordObj.synonym || wordObj.word}`;
+    const synonymBase = String(wordObj.synonym || wordObj.word).toLowerCase();
+    const antonymBase = String(wordObj.antonym || inferAntonym(synonymBase)).toLowerCase();
     const usage = wordObj.usage || buildUsageSentence(wordObj);
+
+    const synonymForms = wordForms(synonymBase);
+    const antonymForms = wordForms(antonymBase);
+
     return {
       ...wordObj,
-      antonym,
+      synonym: synonymForms[0],
+      antonym: antonymForms[0],
+      synonymForms,
+      antonymForms,
       usage,
       comicPanels: buildComicPanels(wordObj),
+      dictionaryUrl: `https://www.merriam-webster.com/dictionary/${encodeURIComponent(wordObj.word)}`,
     };
   }
 
@@ -77,6 +107,8 @@
     buildDailyDeck,
     normalizeWord,
     claimDailyReward,
+    wordForms,
+    inferAntonym,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

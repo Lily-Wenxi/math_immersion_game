@@ -23,6 +23,8 @@ const flashUsageEl = document.getElementById("flashUsage");
 const flashSynonymEl = document.getElementById("flashSynonym");
 const flashAntonymEl = document.getElementById("flashAntonym");
 const comicStripEl = document.getElementById("comicStrip");
+const comicArtEl = document.getElementById("comicArt");
+const mwLinkEl = document.getElementById("mwLink");
 const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
@@ -89,6 +91,34 @@ function renderReviewList() {
   });
 }
 
+
+function escapeXml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function renderComicArt(card) {
+  if (!comicArtEl) return;
+  const p1 = escapeXml(card.comicPanels[0] || "");
+  const p2 = escapeXml(card.comicPanels[1] || "");
+  const p3 = escapeXml(card.comicPanels[2] || "");
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='300' viewBox='0 0 1000 300'>
+    <rect x='0' y='0' width='1000' height='300' rx='20' fill='#f4f7ff'/>
+    <rect x='16' y='16' width='310' height='268' rx='12' fill='#fff'/><rect x='344' y='16' width='310' height='268' rx='12' fill='#fff'/><rect x='672' y='16' width='312' height='268' rx='12' fill='#fff'/>
+    <circle cx='70' cy='170' r='26' fill='#ffd9b3'/><rect x='54' y='198' width='32' height='56' rx='8' fill='#91b6ff'/>
+    <circle cx='400' cy='170' r='26' fill='#ffd9b3'/><rect x='384' y='198' width='32' height='56' rx='8' fill='#90d7b4'/>
+    <circle cx='728' cy='170' r='26' fill='#ffd9b3'/><rect x='712' y='198' width='32' height='56' rx='8' fill='#ffb4cb'/>
+    <rect x='110' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='120' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p1}</text>
+    <rect x='438' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='448' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p2}</text>
+    <rect x='766' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='776' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p3}</text>
+  </svg>`;
+  comicArtEl.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 function renderCard() {
   const card = state.deck[state.index];
   if (!card) return;
@@ -96,9 +126,11 @@ function renderCard() {
   flashWordEl.textContent = card.word;
   flashMeaningEl.textContent = `Meaning: ${card.definition}`;
   flashUsageEl.textContent = `Usage: ${card.usage}`;
-  flashSynonymEl.textContent = card.synonym;
-  flashAntonymEl.textContent = card.antonym;
+  flashSynonymEl.textContent = (card.synonymForms || [card.synonym]).join(", ");
+  flashAntonymEl.textContent = (card.antonymForms || [card.antonym]).join(", ");
   comicStripEl.innerHTML = "";
+  if (mwLinkEl) mwLinkEl.href = card.dictionaryUrl || `https://www.merriam-webster.com/dictionary/${encodeURIComponent(card.word)}`;
+  renderComicArt(card);
 
   card.comicPanels.forEach((panel, idx) => {
     const div = document.createElement("div");
