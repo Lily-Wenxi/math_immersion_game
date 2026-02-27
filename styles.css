@@ -560,3 +560,15 @@ footer {
 .flash-card.flipped .flash-back {
   display: block;
 }
+
+
+.mode-switch {
+  display: flex;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.active-mode {
+  background: linear-gradient(180deg, var(--primary) 0%, #6a58f2 100%) !important;
+  color: #fff !important;
+}

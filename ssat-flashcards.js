@@ -13,6 +13,7 @@ const state = {
   reviewed: {},
   reviewWords: [],
   claimedDays: {},
+  mode: "classic",
 };
 
 const todayKeyEl = document.getElementById("todayKey");
@@ -31,6 +32,8 @@ const mwLinkEl = document.getElementById("mwLink");
 const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
+const studyModeClassicEl = document.getElementById("studyModeClassic");
+const studyModeComicEl = document.getElementById("studyModeComic");
 
 function loadState() {
   const account = Number(localStorage.getItem(ACCOUNT_KEY) || 0);
@@ -123,6 +126,15 @@ function renderComicArt(card) {
   comicArtEl.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
+
+function renderModeUI() {
+  const isComic = state.mode === "comic";
+  if (studyModeClassicEl) studyModeClassicEl.classList.toggle("active-mode", !isComic);
+  if (studyModeComicEl) studyModeComicEl.classList.toggle("active-mode", isComic);
+  if (comicArtEl) comicArtEl.classList.toggle("hidden", !isComic);
+  if (comicStripEl) comicStripEl.classList.toggle("hidden", !isComic);
+}
+
 function renderCard() {
   const card = state.deck[state.index];
   if (!card) return;
@@ -144,6 +156,8 @@ function renderCard() {
     div.innerHTML = `<strong>Panel ${idx + 1}</strong><p>${panel}</p>`;
     comicStripEl.appendChild(div);
   });
+
+  renderModeUI();
 
   const reviewedDone = getReviewedCount() >= state.deck.length;
   const claimed = !!state.claimedDays[state.todayKey];
@@ -194,6 +208,15 @@ document.getElementById("nextCard").addEventListener("click", () => {
   }
 });
 claimRewardEl.addEventListener("click", claimReward);
+studyModeClassicEl.addEventListener("click", () => {
+  state.mode = "classic";
+  renderModeUI();
+});
+studyModeComicEl.addEventListener("click", () => {
+  state.mode = "comic";
+  renderModeUI();
+});
+
 document.getElementById("flipCard").addEventListener("click", () => {
   if (!flashCardEl) return;
   flashCardEl.classList.toggle("flipped");
@@ -202,4 +225,5 @@ document.getElementById("flipCard").addEventListener("click", () => {
 loadState();
 renderStats();
 renderReviewList();
+renderModeUI();
 renderCard();
