@@ -20,9 +20,17 @@
 
     <main class="vocab-main">
       <section class="panel">
-        <h2 id="flashWord">Word</h2>
-        <p id="flashMeaning" class="story"></p>
-        <p id="flashUsage" class="muted"></p>
+        <div id="flashCard" class="flash-card">
+          <div class="flash-face flash-front">
+            <h2 id="flashWord">Word</h2>
+            <p class="muted">Think of the meaning before flipping.</p>
+          </div>
+          <div class="flash-face flash-back">
+            <h2 id="flashWordBack">Meaning & Usage</h2>
+            <p id="flashMeaning" class="story"></p>
+            <p id="flashUsage" class="muted"></p>
+          </div>
+        </div>
 
         <div class="flash-tags">
           <span>Synonym: <strong id="flashSynonym"></strong></span>
@@ -36,6 +44,7 @@
         <div class="actions">
           <button id="knowBtn">I remember this</button>
           <button id="reviewBtn" class="secondary">Need review</button>
+          <button id="flipCard" class="secondary">Flip card</button>
           <button id="nextCard">Next card</button>
         </div>
 
@@ -50,6 +59,7 @@
     </main>
 
     <script src="ssatVocabData.js"></script>
+    <script src="ssatFlashcardDeck.js"></script>
     <script src="ssatFlashcardLogic.js"></script>
     <script src="ssat-flashcards.js"></script>
   </body>

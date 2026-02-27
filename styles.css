@@ -533,3 +533,30 @@ footer {
   background: #eef3ff;
   margin: 0.5rem 0 0.7rem;
 }
+
+
+.flash-card {
+  position: relative;
+  min-height: 180px;
+  border-radius: 14px;
+  border: 1px solid #d8defa;
+  background: #ffffff;
+  padding: 0.8rem;
+  margin-bottom: 0.7rem;
+}
+
+.flash-face {
+  transition: opacity 0.2s ease;
+}
+
+.flash-back {
+  display: none;
+}
+
+.flash-card.flipped .flash-front {
+  display: none;
+}
+
+.flash-card.flipped .flash-back {
+  display: block;
+}

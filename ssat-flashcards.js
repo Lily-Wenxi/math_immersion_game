@@ -1,4 +1,5 @@
 const { getWordBank } = window.SSATVocabData;
+const { getDeck } = window.SSATFlashcardDeck || { getDeck: null };
 const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward } = window.SSATFlashcardLogic;
 
 const FLASHCARD_KEY = "ssatFlashcardDaily";
@@ -18,6 +19,8 @@ const todayKeyEl = document.getElementById("todayKey");
 const reviewedCountEl = document.getElementById("reviewedCount");
 const accountPointsEl = document.getElementById("accountPoints");
 const flashWordEl = document.getElementById("flashWord");
+const flashCardEl = document.getElementById("flashCard");
+const flashWordBackEl = document.getElementById("flashWordBack");
 const flashMeaningEl = document.getElementById("flashMeaning");
 const flashUsageEl = document.getElementById("flashUsage");
 const flashSynonymEl = document.getElementById("flashSynonym");
@@ -45,7 +48,8 @@ function loadState() {
     state.claimedDays = {};
   }
 
-  const wordBank = getWordBank().map((w) => normalizeWord(w));
+  const sourceDeck = typeof getDeck === "function" ? getDeck() : getWordBank();
+  const wordBank = sourceDeck.map((w) => normalizeWord(w));
   state.deck = buildDailyDeck(wordBank, state.todayKey, 20);
   if (state.index >= state.deck.length) state.index = state.deck.length - 1;
   if (state.index < 0) state.index = 0;
@@ -122,8 +126,10 @@ function renderComicArt(card) {
 function renderCard() {
   const card = state.deck[state.index];
   if (!card) return;
+  if (flashCardEl) flashCardEl.classList.remove("flipped");
 
   flashWordEl.textContent = card.word;
+  if (flashWordBackEl) flashWordBackEl.textContent = card.word;
   flashMeaningEl.textContent = `Meaning: ${card.definition}`;
   flashUsageEl.textContent = `Usage: ${card.usage}`;
   flashSynonymEl.textContent = card.synonym;
@@ -151,6 +157,7 @@ function renderCard() {
 function markCard(needsReview) {
   const card = state.deck[state.index];
   if (!card) return;
+  if (flashCardEl) flashCardEl.classList.remove("flipped");
   state.reviewed[card.word] = true;
 
   if (needsReview && !state.reviewWords.includes(card.word)) {
@@ -187,6 +194,10 @@ document.getElementById("nextCard").addEventListener("click", () => {
   }
 });
 claimRewardEl.addEventListener("click", claimReward);
+document.getElementById("flipCard").addEventListener("click", () => {
+  if (!flashCardEl) return;
+  flashCardEl.classList.toggle("flipped");
+});
 
 loadState();
 renderStats();
