@@ -108,8 +108,49 @@ function escapeXml(value) {
     .replaceAll("'", "&#39;");
 }
 
+
+function renderTentativeComic() {
+  if (!comicArtEl) return;
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='700' viewBox='0 0 1000 700'>
+    <rect width='1000' height='700' fill='#dfeeff'/>
+    <text x='500' y='58' text-anchor='middle' font-size='56' font-family='Arial' font-weight='700' fill='#1f3f86'>What is TENTATIVE?</text>
+
+    <rect x='40' y='100' width='440' height='250' rx='16' fill='#fff8ef' stroke='#2d5ca5' stroke-width='6'/>
+    <rect x='60' y='118' width='230' height='46' rx='10' fill='#ef6b2e'/>
+    <text x='175' y='150' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>NOT CERTAIN</text>
+    <text x='70' y='225' font-size='28' fill='#223' font-family='Arial'>Maybe beach… maybe mountains…</text>
+    <text x='70' y='262' font-size='28' fill='#223' font-family='Arial'>I am still deciding.</text>
+
+    <rect x='520' y='100' width='440' height='250' rx='16' fill='#fff3ff' stroke='#2d5ca5' stroke-width='6'/>
+    <rect x='540' y='118' width='280' height='46' rx='10' fill='#6f4ebf'/>
+    <text x='680' y='150' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>UNSURE / HESITANT</text>
+    <text x='550' y='225' font-size='28' fill='#223' font-family='Arial'>Should I step forward?</text>
+    <text x='550' y='262' font-size='28' fill='#223' font-family='Arial'>I'm not fully sure yet.</text>
+
+    <rect x='40' y='380' width='440' height='250' rx='16' fill='#f3fff1' stroke='#2d5ca5' stroke-width='6'/>
+    <rect x='60' y='398' width='240' height='46' rx='10' fill='#3a9d43'/>
+    <text x='180' y='430' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>JUST TESTING</text>
+    <text x='70' y='505' font-size='28' fill='#223' font-family='Arial'>I’ll try a little first…</text>
+    <text x='70' y='542' font-size='28' fill='#223' font-family='Arial'>to see if it works.</text>
+
+    <rect x='520' y='380' width='440' height='250' rx='16' fill='#fff5ec' stroke='#2d5ca5' stroke-width='6'/>
+    <rect x='540' y='398' width='220' height='46' rx='10' fill='#d9573b'/>
+    <text x='650' y='430' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>NOT FINAL</text>
+    <text x='550' y='505' font-size='28' fill='#223' font-family='Arial'>This is a tentative plan.</text>
+    <text x='550' y='542' font-size='28' fill='#223' font-family='Arial'>It can still change later.</text>
+
+    <text x='500' y='680' text-anchor='middle' font-size='40' font-family='Arial' font-weight='700' fill='#16366f'>Tentative = uncertain, cautious, not final.</text>
+  </svg>`;
+  comicArtEl.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
 function renderComicArt(card) {
   if (!comicArtEl) return;
+  if (String(card.word || "").toLowerCase() === "tentative") {
+    renderTentativeComic();
+    return;
+  }
+
   const p1 = escapeXml(card.comicPanels[0] || "");
   const p2 = escapeXml(card.comicPanels[1] || "");
   const p3 = escapeXml(card.comicPanels[2] || "");
