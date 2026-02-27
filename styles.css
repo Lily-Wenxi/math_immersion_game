@@ -483,3 +483,44 @@ footer {
 .word-visual figcaption {
   margin-top: 0.35rem;
 }
+
+
+.flash-tags {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin: 0.7rem 0;
+}
+
+.flash-tags span {
+  border: 1px solid #d8defc;
+  border-radius: 999px;
+  background: #f6f8ff;
+  padding: 0.28rem 0.62rem;
+}
+
+.comic-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin: 0.8rem 0;
+}
+
+.comic-panel {
+  border: 1px solid #d9e2ff;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff 0%, #f3f7ff 100%);
+  padding: 0.6rem;
+  min-height: 110px;
+}
+
+.comic-panel p {
+  margin: 0.3rem 0 0;
+  color: #56608f;
+}
+
+@media (max-width: 900px) {
+  .comic-strip {
+    grid-template-columns: 1fr;
+  }
+}

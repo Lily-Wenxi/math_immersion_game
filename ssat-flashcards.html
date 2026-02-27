@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSAT Flash Cards Daily Check-in</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>SSAT Flash Cards · Daily 20-word Check-in</h1>
+      <p>Learn core meaning + usage + synonym + antonym in comic scenes. Finish 20 words to claim points.</p>
+      <a class="back-link" href="ssat-vocab.html">← Back to SSAT Vocabulary Practice</a>
+      <div class="stats">
+        <span>Today: <strong id="todayKey"></strong></span>
+        <span>Reviewed: <strong id="reviewedCount">0</strong>/20</span>
+        <span>Account Points: <strong id="accountPoints">0</strong></span>
+      </div>
+    </header>
+
+    <main class="vocab-main">
+      <section class="panel">
+        <h2 id="flashWord">Word</h2>
+        <p id="flashMeaning" class="story"></p>
+        <p id="flashUsage" class="muted"></p>
+
+        <div class="flash-tags">
+          <span>Synonym: <strong id="flashSynonym"></strong></span>
+          <span>Antonym: <strong id="flashAntonym"></strong></span>
+        </div>
+
+        <div id="comicStrip" class="comic-strip"></div>
+
+        <div class="actions">
+          <button id="knowBtn">I remember this</button>
+          <button id="reviewBtn" class="secondary">Need review</button>
+          <button id="nextCard">Next card</button>
+        </div>
+
+        <p id="checkinMsg" class="feedback"></p>
+        <button id="claimReward" class="hidden">Claim daily reward (+40)</button>
+      </section>
+
+      <section class="panel">
+        <h2>Words to review again (生词复习)</h2>
+        <ul id="reviewList" class="mistake-list"></ul>
+      </section>
+    </main>
+
+    <script src="ssatVocabData.js"></script>
+    <script src="ssatFlashcardLogic.js"></script>
+    <script src="ssat-flashcards.js"></script>
+  </body>
+</html>
