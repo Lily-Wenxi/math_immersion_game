@@ -13,13 +13,12 @@ A lightweight web app for grades 7-9 that combines:
 - 3-question same-topic reinforcement practice from mistakes
 - Equipment Shop: spend earned points to buy gear
 - Sound feedback: different sounds for correct vs incorrect answers
-<<<<<<< codex/develop-math-immersion-game-for-seventh-grade-hhj1ih
 - Flying Fairy effect: fairy suddenly flies across the screen and speaks feedback automatically (congratulates on correct answers, says "keep going~!" on incorrect answers)
-=======
-- Fairy popup: appears with congratulations on correct answers and encouragement on incorrect answers
->>>>>>> main
+- Animated reward feedback: points burst animation on newly cleared levels plus panel celebrate/shake motion for correct/incorrect answers
 - Hints and full solutions for each question
 - Flexible answer checking (direct match + numeric equivalence)
+- SSAT Middle Vocabulary page with a 2500-word bank, synonym/definition multiple choice, image-based visual hint cards for each word, and a Word Notebook that re-injects wrong words into future practice
+- Daily SSAT Flash Card check-in (20 words/day) with Quizlet-style flip cards (classic mode) + optional comic-context mode, curated synonym/antonym pairs, Merriam-Webster reference links, and daily point rewards added to the learner account
 
 ## Run locally
 
@@ -28,6 +27,8 @@ python3 -m http.server 8000
 ```
 
 Open: `http://localhost:8000/index.html`
+Vocabulary page: `http://localhost:8000/ssat-vocab.html`
+Daily flashcards: `http://localhost:8000/ssat-flashcards.html`
 
 ## Unit tests
 
@@ -46,3 +47,7 @@ Covered modules:
 - Extend curriculum to grades 10-12 with progressive difficulty
 - Add authorized historical contest datasets
 - Add "mistake retry sets" by knowledge point
+
+## Recent update
+
+- SSAT flashcard comic blocks were simplified by removing panel-number labels (Panel 1/2/3) for a cleaner reading experience.
