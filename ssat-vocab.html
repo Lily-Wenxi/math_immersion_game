@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SSAT Vocabulary Practice</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>SSAT Middle Level Vocabulary Lab</h1>
+      <p>Practice synonyms + definitions. Wrong words go into your Word Notebook and will reappear in future practice.</p>
+      <a class="back-link" href="index.html">← Back to Math Immersion</a>
+      <a class="back-link" href="ssat-flashcards.html">Go to Daily Flash Cards →</a>
+      <div class="stats" aria-live="polite">
+        <span>Questions: <strong id="qCount">0</strong></span>
+        <span>Correct: <strong id="correctCount">0</strong></span>
+        <span>Accuracy: <strong id="accuracy">0%</strong></span>
+        <span>Notebook: <strong id="notebookCount">0</strong></span>
+        <span>Bank: <strong id="bankCount">0</strong></span>
+      </div>
+    </header>
+
+    <main class="vocab-main">
+      <section class="panel">
+        <h2 id="questionType">Vocabulary Practice</h2>
+        <p id="questionPrompt" class="story">Press “Next Question” to start.</p>
+        <figure class="word-visual">
+          <img id="wordImage" alt="Vocabulary visual hint" />
+          <figcaption id="wordImageCaption" class="muted"></figcaption>
+        </figure>
+        <div id="choiceList" class="choice-list"></div>
+        <p id="vocabFeedback" class="feedback"></p>
+        <p id="vocabExplain" class="muted"></p>
+        <div class="actions">
+          <button id="nextQuestion">Next Question</button>
+          <button id="clearNotebook" class="secondary">Clear Notebook</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Word Notebook (生词本)</h2>
+        <p class="muted">Words answered incorrectly are saved here and prioritized in future questions.</p>
+        <ul id="notebookList" class="mistake-list"></ul>
+      </section>
+    </main>
+
+    <script src="ssatVocabData.js"></script>
+    <script src="ssatVocabLogic.js"></script>
+    <script src="ssat-vocab.js"></script>
+  </body>
+</html>
