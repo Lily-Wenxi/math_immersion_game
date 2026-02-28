@@ -47,3 +47,7 @@ Covered modules:
 - Extend curriculum to grades 10-12 with progressive difficulty
 - Add authorized historical contest datasets
 - Add "mistake retry sets" by knowledge point
+
+## Recent update
+
+- SSAT flashcard comic blocks were simplified by removing panel-number labels (Panel 1/2/3) for a cleaner reading experience.
