@@ -7,6 +7,8 @@ const {
   normalizeWord,
   claimDailyReward,
   getComicScene,
+  toWordSlug,
+  getWordImageCandidates,
 } = require('../ssatFlashcardLogic');
 const { getWordBank } = require('../ssatVocabData');
 
@@ -45,4 +47,15 @@ test('getComicScene returns expected shape', () => {
   assert.ok(scene.bg);
   assert.ok(scene.emoji);
   assert.ok(scene.prop);
+});
+
+
+test('toWordSlug normalizes word into filename slug', () => {
+  assert.equal(toWordSlug('Word Power!'), 'word-power');
+});
+
+test('getWordImageCandidates builds image paths by word name', () => {
+  const candidates = getWordImageCandidates('Tentative');
+  assert.equal(candidates[0], 'assets/flashcards/tentative.png');
+  assert.equal(candidates.length, 5);
 });

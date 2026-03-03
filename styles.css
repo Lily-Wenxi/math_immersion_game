@@ -485,6 +485,22 @@ footer {
 }
 
 
+
+.flash-image-wrap {
+  margin: 0.75rem 0 0;
+  text-align: center;
+}
+
+.flash-image {
+  width: min(100%, 320px);
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 2px solid #ffd7ef;
+  background: #fff;
+  padding: 0.35rem;
+}
+
 .flash-tags {
   display: flex;
   gap: 0.8rem;

@@ -1,6 +1,6 @@
 const { getWordBank } = window.SSATVocabData;
 const { getDeck } = window.SSATFlashcardDeck || { getDeck: null };
-const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward } = window.SSATFlashcardLogic;
+const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward, getWordImageCandidates } = window.SSATFlashcardLogic;
 
 const FLASHCARD_KEY = "ssatFlashcardDaily";
 const ACCOUNT_KEY = "ssatAccountPoints";
@@ -25,6 +25,9 @@ const flashMeaningEl = document.getElementById("flashMeaning");
 const flashUsageEl = document.getElementById("flashUsage");
 const flashSynonymEl = document.getElementById("flashSynonym");
 const flashAntonymEl = document.getElementById("flashAntonym");
+const flashImageWrapEl = document.getElementById("flashImageWrap");
+const flashImageEl = document.getElementById("flashImage");
+const flashImageCaptionEl = document.getElementById("flashImageCaption");
 const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
@@ -92,10 +95,49 @@ function renderReviewList() {
   });
 }
 
+
+function hideWordImage() {
+  if (flashImageWrapEl) flashImageWrapEl.classList.add("hidden");
+  if (flashImageEl) {
+    flashImageEl.removeAttribute("src");
+    flashImageEl.onerror = null;
+  }
+  if (flashImageCaptionEl) flashImageCaptionEl.textContent = "";
+}
+
+function showWordImage(word) {
+  if (!flashImageWrapEl || !flashImageEl) return;
+
+  const candidates = getWordImageCandidates(word);
+  if (!candidates.length) {
+    hideWordImage();
+    return;
+  }
+
+  let idx = 0;
+  const tryNext = () => {
+    if (idx >= candidates.length) {
+      hideWordImage();
+      return;
+    }
+    flashImageEl.onerror = () => {
+      idx += 1;
+      tryNext();
+    };
+    flashImageEl.src = candidates[idx];
+  };
+
+  flashImageEl.onerror = null;
+  tryNext();
+  flashImageWrapEl.classList.remove("hidden");
+  if (flashImageCaptionEl) flashImageCaptionEl.textContent = `Image: ${word}`;
+}
+
 function renderCard() {
   const card = state.deck[state.index];
   if (!card) return;
   if (flashCardEl) flashCardEl.classList.remove("flipped");
+  hideWordImage();
 
   flashWordEl.textContent = card.word;
   if (flashWordBackEl) flashWordBackEl.textContent = card.word;
@@ -157,6 +199,14 @@ claimRewardEl.addEventListener("click", claimReward);
 document.getElementById("flipCard").addEventListener("click", () => {
   if (!flashCardEl) return;
   flashCardEl.classList.toggle("flipped");
+  const card = state.deck[state.index];
+  if (!card) return;
+
+  if (flashCardEl.classList.contains("flipped")) {
+    showWordImage(card.word);
+  } else {
+    hideWordImage();
+  }
 });
 
 loadState();

@@ -18,7 +18,7 @@ A lightweight web app for grades 7-9 that combines:
 - Hints and full solutions for each question
 - Flexible answer checking (direct match + numeric equivalence)
 - SSAT Middle Vocabulary page with a 2500-word bank, synonym/definition multiple choice, image-based visual hint cards for each word, and a Word Notebook that re-injects wrong words into future practice
-- Daily SSAT Flash Card check-in (20 words/day) with clean flip cards, core meaning/usage/synonym/antonym review, and daily point rewards added to the learner account
+- Daily SSAT Flash Card check-in (20 words/day) with clean flip cards, core meaning/usage/synonym/antonym review, word-matched images on flip (`assets/flashcards/<word>.*`), and daily point rewards added to the learner account
 
 ## Run locally
 
@@ -33,7 +33,7 @@ Daily flashcards: `http://localhost:8000/ssat-flashcards.html`
 ## Unit tests
 
 ```bash
-node --test tests/gameLogic.test.js tests/reinforcement.test.js tests/curriculum.test.js tests/shopLogic.test.js
+node --test tests/gameLogic.test.js tests/reinforcement.test.js tests/curriculum.test.js tests/shopLogic.test.js tests/ssatVocabLogic.test.js tests/ssatFlashcardDeck.test.js tests/ssatFlashcardLogic.test.js
 ```
 
 Covered modules:
@@ -51,3 +51,5 @@ Covered modules:
 ## Recent update
 
 - SSAT flashcard UI was simplified by removing dictionary reference links, comic effects, and situational dialogue blocks.
+
+- Flashcards now try to load image files by word name when flipped (supports png/jpg/jpeg/webp/svg under `assets/flashcards/`).

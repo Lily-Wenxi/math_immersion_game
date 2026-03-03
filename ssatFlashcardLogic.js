@@ -141,6 +141,21 @@
     };
   }
 
+  function toWordSlug(word) {
+    return String(word || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  }
+
+  function getWordImageCandidates(word, baseDir = "assets/flashcards") {
+    const slug = toWordSlug(word);
+    if (!slug) return [];
+    const exts = ["png", "jpg", "jpeg", "webp", "svg"];
+    return exts.map((ext) => `${baseDir}/${slug}.${ext}`);
+  }
+
 
   function getComicScene(wordObj) {
     const text = `${wordObj.word} ${wordObj.definition} ${wordObj.synonym} ${wordObj.antonym}`.toLowerCase();
@@ -174,6 +189,8 @@
     normalizeWord,
     claimDailyReward,
     getComicScene,
+    toWordSlug,
+    getWordImageCandidates,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;
