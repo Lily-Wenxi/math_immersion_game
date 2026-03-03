@@ -149,11 +149,41 @@
       .replace(/^-+|-+$/g, "");
   }
 
-  function getWordImageCandidates(word, baseDir = "assets/flashcards") {
-    const slug = toWordSlug(word);
+  function unique(arr) {
+    return Array.from(new Set(arr));
+  }
+
+  function buildWordNameVariants(word) {
+    const raw = String(word || "").trim();
+    const slug = toWordSlug(raw);
     if (!slug) return [];
+
+    const lowered = raw.toLowerCase();
+    const snake = slug.replace(/-/g, "_");
+    const noDash = slug.replace(/-/g, "");
+    const compactRaw = lowered.replace(/[^a-z0-9]+/g, "");
+
+    return unique([slug, lowered, snake, noDash, compactRaw]).filter(Boolean);
+  }
+
+  function getWordImageCandidates(word, baseDirs = ["assets/flashcards", "flashcards"]) {
+    const variants = buildWordNameVariants(word);
+    if (!variants.length) return [];
+
+    const dirs = Array.isArray(baseDirs) ? baseDirs : [baseDirs];
     const exts = ["png", "jpg", "jpeg", "webp", "svg"];
-    return exts.map((ext) => `${baseDir}/${slug}.${ext}`);
+    const candidates = [];
+
+    dirs.forEach((dir) => {
+      const cleanedDir = String(dir || "").replace(/\/+$/, "");
+      variants.forEach((name) => {
+        exts.forEach((ext) => {
+          candidates.push(`${cleanedDir}/${name}.${ext}`);
+        });
+      });
+    });
+
+    return unique(candidates);
   }
 
 
@@ -191,6 +221,7 @@
     getComicScene,
     toWordSlug,
     getWordImageCandidates,
+    buildWordNameVariants,
   };
 
   if (typeof module !== "undefined" && module.exports) module.exports = api;

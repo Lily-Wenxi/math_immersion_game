@@ -30,6 +30,14 @@ Open: `http://localhost:8000/index.html`
 Vocabulary page: `http://localhost:8000/ssat-vocab.html`
 Daily flashcards: `http://localhost:8000/ssat-flashcards.html`
 
+If you put your own word images in `./flashcards`, run:
+
+```bash
+node scripts/sync-flashcard-images.js
+```
+
+This bulk-copies images into `assets/flashcards/` using normalized word filenames.
+
 ## Unit tests
 
 ```bash
