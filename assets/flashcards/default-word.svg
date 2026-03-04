@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" viewBox="0 0 720 420">
+  <rect width="720" height="420" fill="#f6f8ff"/>
+  <rect x="24" y="24" width="672" height="372" rx="22" fill="#ffffff" stroke="#cdd8ff" stroke-width="4"/>
+  <text x="360" y="145" text-anchor="middle" font-size="48" font-family="Arial" fill="#5f6fe6">Flashcard Image</text>
+  <text x="360" y="205" text-anchor="middle" font-size="28" font-family="Arial" fill="#6a6f8f">No specific word picture yet</text>
+  <text x="360" y="258" text-anchor="middle" font-size="24" font-family="Arial" fill="#8b90ac">You can upload a word-matched image into</text>
+  <text x="360" y="292" text-anchor="middle" font-size="24" font-family="Arial" fill="#8b90ac">assets/flashcards/&lt;word&gt;.(png/jpg/svg)</text>
+  <text x="360" y="350" text-anchor="middle" font-size="56">📘✨</text>
+</svg>
