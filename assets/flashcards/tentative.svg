@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="360" viewBox="0 0 600 360">
+  <rect width="600" height="360" fill="#fff8e8"/>
+  <rect x="30" y="30" width="540" height="300" rx="20" fill="#ffffff" stroke="#ffd27a" stroke-width="4"/>
+  <text x="300" y="95" text-anchor="middle" font-size="42" font-family="Arial" fill="#ff8a00">tentative</text>
+  <text x="300" y="145" text-anchor="middle" font-size="24" font-family="Arial" fill="#444">not fully decided yet</text>
+  <circle cx="150" cy="235" r="42" fill="#d9ecff"/>
+  <text x="150" y="243" text-anchor="middle" font-size="28">🤔</text>
+  <circle cx="450" cy="235" r="42" fill="#ffe3ef"/>
+  <text x="450" y="243" text-anchor="middle" font-size="28">📝</text>
+  <text x="300" y="292" text-anchor="middle" font-size="20" font-family="Arial" fill="#666">"Our trip date is tentative until everyone confirms."</text>
+</svg>

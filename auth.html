@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Login & Registration</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>Account Center</h1>
+      <p>Register a new account to unlock all practice content.</p>
+      <a class="back-link" href="index.html">← Back to Math Immersion</a>
+    </header>
+
+    <main class="vocab-main">
+      <section class="panel">
+        <h2>Login</h2>
+        <form id="loginForm" class="auth-form">
+          <label>Email <input name="email" type="email" required /></label>
+          <label>Password <input name="password" type="password" required /></label>
+          <button type="submit">Login</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Register New User</h2>
+        <form id="registerForm" class="auth-form">
+          <label>Username <input name="username" required /></label>
+          <label>Email <input name="email" type="email" required /></label>
+          <label>Password <input name="password" type="password" required minlength="6" /></label>
+          <label>Address <input name="address" required /></label>
+          <label>Phone <input name="phone" required /></label>
+          <label>Age <input id="ageInput" name="age" type="number" min="1" max="120" required /></label>
+
+          <div id="parentFields" class="auth-parent hidden">
+            <p class="muted">For users under 18, parent/guardian info is required.</p>
+            <label>Parent/Guardian Name <input name="parentName" /></label>
+            <label>Parent/Guardian Email <input name="parentEmail" type="email" /></label>
+            <label>Parent/Guardian Phone <input name="parentPhone" /></label>
+          </div>
+
+          <button type="submit">Create Account</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Find Password by Email</h2>
+        <form id="findPwdForm" class="auth-form">
+          <label>Email <input name="email" type="email" required /></label>
+          <button type="submit" class="secondary">Find Password</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Status</h2>
+        <p id="authMessage" class="feedback"></p>
+      </section>
+    </main>
+
+    <script src="auth.js"></script>
+    <script src="auth-page.js"></script>
+  </body>
+</html>
