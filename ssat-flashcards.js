@@ -101,6 +101,9 @@ function hideWordImage() {
   if (flashImageEl) {
     flashImageEl.removeAttribute("src");
     flashImageEl.onerror = null;
+    flashImageEl.onload = null;
+    flashImageEl.style.width = "";
+    flashImageEl.style.height = "";
   }
   if (flashImageCaptionEl) flashImageCaptionEl.textContent = "";
 }
@@ -124,10 +127,17 @@ function showWordImage(word) {
       idx += 1;
       tryNext();
     };
+    flashImageEl.onload = () => {
+      const halfWidth = Math.max(1, Math.round(flashImageEl.naturalWidth / 2));
+      const halfHeight = Math.max(1, Math.round(flashImageEl.naturalHeight / 2));
+      flashImageEl.style.width = `${halfWidth}px`;
+      flashImageEl.style.height = `${halfHeight}px`;
+    };
     flashImageEl.src = candidates[idx];
   };
 
   flashImageEl.onerror = null;
+  flashImageEl.onload = null;
   tryNext();
   flashImageWrapEl.classList.remove("hidden");
   if (flashImageCaptionEl) flashImageCaptionEl.textContent = `Image: ${word}`;
@@ -187,6 +197,13 @@ function claimReward() {
 
 document.getElementById("knowBtn").addEventListener("click", () => markCard(false));
 document.getElementById("reviewBtn").addEventListener("click", () => markCard(true));
+document.getElementById("prevCard").addEventListener("click", () => {
+  if (state.index > 0) {
+    state.index -= 1;
+    saveState();
+    renderCard();
+  }
+});
 document.getElementById("nextCard").addEventListener("click", () => {
   if (state.index < state.deck.length - 1) {
     state.index += 1;

@@ -494,7 +494,7 @@ footer {
 .flash-image {
   width: auto;
   height: auto;
-  max-width: none;
+  max-width: 100%;
   max-height: none;
   border-radius: 12px;
   border: 2px solid #ffd7ef;
