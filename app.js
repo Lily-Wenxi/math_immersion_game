@@ -4,6 +4,7 @@ const { isAnswerCorrect } = window.GameLogic;
 const { generateQuestionsByTopic } = window.Reinforcement;
 const { getSupportedGrades, getLevelsByGrade } = window.Curriculum;
 const { getCatalog, purchaseEquipment } = window.ShopLogic;
+const Auth = window.Auth;
 
 const state = {
   currentGrade: 7,
@@ -389,8 +390,28 @@ function renderReinforcement() {
   });
 }
 
+
+function showRegisterReminder(targetEl, text) {
+  targetEl.innerHTML = `${text} <a href="auth.html">Register / Login</a>`;
+  targetEl.className = "feedback bad";
+}
+
+function canPlayMathTrial() {
+  if (!Auth || Auth.isLoggedIn()) return true;
+  const result = Auth.consumeGuestTrial("math", 1);
+  if (!result.ok) {
+    showRegisterReminder(
+      feedbackEl,
+      "Trial finished: new users can try one math question for free."
+    );
+    return false;
+  }
+  return true;
+}
+
 function submitAnswer() {
   if (!state.selectedLevel) return;
+  if (!canPlayMathTrial()) return;
   const correct = isAnswerCorrect(answerInputEl.value, state.selectedLevel.answers);
 
   if (correct) {

@@ -19,6 +19,8 @@ A lightweight web app for grades 7-9 that combines:
 - Flexible answer checking (direct match + numeric equivalence)
 - SSAT Middle Vocabulary page with a 2500-word bank, synonym/definition multiple choice, image-based visual hint cards for each word, and a Word Notebook that re-injects wrong words into future practice
 - Daily SSAT Flash Card check-in (20 words/day) with clean flip cards, core meaning/usage/synonym/antonym review, word-matched images on flip (`assets/flashcards/<word>.*`), and daily point rewards added to the learner account
+- Login/Register account center with username, email, password, address, phone, under-18 parent/guardian info, email+password login, and email-based password lookup
+- Guest trial limits: 3 flashcards, 1 math question, or 1 vocabulary question before registration reminder
 
 ## Run locally
 
@@ -29,6 +31,7 @@ python3 -m http.server 8000
 Open: `http://localhost:8000/index.html`
 Vocabulary page: `http://localhost:8000/ssat-vocab.html`
 Daily flashcards: `http://localhost:8000/ssat-flashcards.html`
+Account page: `http://localhost:8000/auth.html`
 
 If you put your own word images in `./flashcards`, run:
 
@@ -41,7 +44,7 @@ This bulk-copies images into `assets/flashcards/` using normalized word filename
 ## Unit tests
 
 ```bash
-node --test tests/gameLogic.test.js tests/reinforcement.test.js tests/curriculum.test.js tests/shopLogic.test.js tests/ssatVocabLogic.test.js tests/ssatFlashcardDeck.test.js tests/ssatFlashcardLogic.test.js
+node --test tests/gameLogic.test.js tests/reinforcement.test.js tests/curriculum.test.js tests/shopLogic.test.js tests/ssatVocabLogic.test.js tests/ssatFlashcardDeck.test.js tests/ssatFlashcardLogic.test.js tests/auth.test.js
 ```
 
 Covered modules:

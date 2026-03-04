@@ -1,6 +1,7 @@
 const { getWordBank } = window.SSATVocabData;
 const { getDeck } = window.SSATFlashcardDeck || { getDeck: null };
 const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward, getWordImageCandidates } = window.SSATFlashcardLogic;
+const Auth = window.Auth;
 
 const FLASHCARD_KEY = "ssatFlashcardDaily";
 const ACCOUNT_KEY = "ssatAccountPoints";
@@ -165,7 +166,20 @@ function renderCard() {
   }
 }
 
+
+function requireFlashTrial() {
+  if (!Auth || Auth.isLoggedIn()) return true;
+  const result = Auth.consumeGuestTrial("flash", 3);
+  if (!result.ok) {
+    checkinMsgEl.innerHTML = 'Trial finished: new users can review up to 3 flash cards for free. <a href="auth.html">Register / Login</a>';
+    checkinMsgEl.className = "feedback bad";
+    return false;
+  }
+  return true;
+}
+
 function markCard(needsReview) {
+  if (!requireFlashTrial()) return;
   const card = state.deck[state.index];
   if (!card) return;
   if (flashCardEl) flashCardEl.classList.remove("flipped");
@@ -180,6 +194,17 @@ function markCard(needsReview) {
   renderStats();
   renderReviewList();
   renderCard();
+}
+
+
+function canAdvanceFlashCard() {
+  if (!Auth || Auth.isLoggedIn()) return true;
+  if (state.index >= 2) {
+    checkinMsgEl.innerHTML = 'Trial finished: guests can preview up to 3 flash cards. <a href="auth.html">Register / Login</a>';
+    checkinMsgEl.className = "feedback bad";
+    return false;
+  }
+  return true;
 }
 
 function claimReward() {
@@ -205,6 +230,7 @@ document.getElementById("prevCard").addEventListener("click", () => {
   }
 });
 document.getElementById("nextCard").addEventListener("click", () => {
+  if (!canAdvanceFlashCard()) return;
   if (state.index < state.deck.length - 1) {
     state.index += 1;
     saveState();
