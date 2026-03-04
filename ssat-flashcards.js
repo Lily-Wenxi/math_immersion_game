@@ -33,25 +33,6 @@ const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
 
-const FALLBACK_FLASH_IMAGE = "assets/flashcards/default-word.svg";
-
-function applyHalfSize() {
-  const halfWidth = Math.max(1, Math.round(flashImageEl.naturalWidth / 2));
-  const halfHeight = Math.max(1, Math.round(flashImageEl.naturalHeight / 2));
-  flashImageEl.style.width = `${halfWidth}px`;
-  flashImageEl.style.height = `${halfHeight}px`;
-}
-
-function showFallbackImage(word) {
-  if (!flashImageWrapEl || !flashImageEl) return;
-  flashImageEl.onerror = null;
-  flashImageEl.onload = () => applyHalfSize();
-  flashImageEl.src = FALLBACK_FLASH_IMAGE;
-  flashImageWrapEl.classList.remove("hidden");
-  if (flashImageCaptionEl) flashImageCaptionEl.textContent = `Image: ${word} (default)`;
-}
-
-
 function loadState() {
   const account = Number(localStorage.getItem(ACCOUNT_KEY) || 0);
   state.accountPoints = Number.isFinite(account) ? account : 0;
@@ -140,14 +121,19 @@ function showWordImage(word) {
   let idx = 0;
   const tryNext = () => {
     if (idx >= candidates.length) {
-      showFallbackImage(word);
+      hideWordImage();
       return;
     }
     flashImageEl.onerror = () => {
       idx += 1;
       tryNext();
     };
-    flashImageEl.onload = () => applyHalfSize();
+    flashImageEl.onload = () => {
+      const halfWidth = Math.max(1, Math.round(flashImageEl.naturalWidth / 2));
+      const halfHeight = Math.max(1, Math.round(flashImageEl.naturalHeight / 2));
+      flashImageEl.style.width = `${halfWidth}px`;
+      flashImageEl.style.height = `${halfHeight}px`;
+    };
     flashImageEl.src = candidates[idx];
   };
 

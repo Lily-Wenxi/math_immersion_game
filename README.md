@@ -63,4 +63,4 @@ Covered modules:
 
 - SSAT flashcard UI was simplified by removing dictionary reference links, comic effects, and situational dialogue blocks.
 
-- Flashcards now try to load image files by word name when flipped (supports png/jpg/jpeg/webp/svg under `assets/flashcards/`) and falls back to a default image when a word image is missing.
+- Flashcards now try to load image files by word name when flipped (supports png/jpg/jpeg/webp/svg under `assets/flashcards/`).
