@@ -74,3 +74,10 @@ test('getWordImageCandidates checks both assets/flashcards and flashcards folder
   assert.ok(candidates.includes('assets/flashcards/tentative.png'));
   assert.ok(candidates.includes('flashcards/tentative.png'));
 });
+
+
+test('claimDailyReward supports custom reward values', () => {
+  const ok = claimDailyReward(10, false, 1);
+  assert.equal(ok.ok, true);
+  assert.equal(ok.points, 11);
+});

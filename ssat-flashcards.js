@@ -26,6 +26,7 @@ const flashMeaningEl = document.getElementById("flashMeaning");
 const flashUsageEl = document.getElementById("flashUsage");
 const flashSynonymEl = document.getElementById("flashSynonym");
 const flashAntonymEl = document.getElementById("flashAntonym");
+const flashTagsEl = document.getElementById("flashTags");
 const flashImageWrapEl = document.getElementById("flashImageWrap");
 const flashImageEl = document.getElementById("flashImage");
 const flashImageCaptionEl = document.getElementById("flashImageCaption");
@@ -163,6 +164,7 @@ function renderCard() {
   if (!card) return;
   if (flashCardEl) flashCardEl.classList.remove("flipped");
   hideWordImage();
+  if (flashTagsEl) flashTagsEl.classList.add("hidden");
 
   flashWordEl.textContent = card.word;
   if (flashWordBackEl) flashWordBackEl.textContent = card.word;
@@ -173,10 +175,13 @@ function renderCard() {
 
   const reviewedDone = getReviewedCount() >= state.deck.length;
   const claimed = !!state.claimedDays[state.todayKey];
-  claimRewardEl.classList.toggle("hidden", !(reviewedDone && !claimed));
-  if (claimed) {
+  if (claimRewardEl) claimRewardEl.classList.add("hidden");
+  if (claimed && !checkinMsgEl.textContent) {
     checkinMsgEl.textContent = "Daily check-in already completed. Come back tomorrow for new 20 words.";
     checkinMsgEl.className = "feedback good";
+  } else if (!reviewedDone && !claimed) {
+    checkinMsgEl.textContent = "";
+    checkinMsgEl.className = "feedback";
   }
 }
 
@@ -192,6 +197,21 @@ function requireFlashTrial() {
   return true;
 }
 
+
+function autoClaimDailyCheckin() {
+  const reviewedDone = getReviewedCount() >= state.deck.length;
+  const claimed = !!state.claimedDays[state.todayKey];
+  if (!reviewedDone || claimed) return;
+
+  const result = claimDailyReward(state.accountPoints, false, 1);
+  if (!result.ok) return;
+
+  state.accountPoints = result.points;
+  state.claimedDays[state.todayKey] = true;
+  checkinMsgEl.textContent = "Daily check-in complete! +1 point added automatically.";
+  checkinMsgEl.className = "feedback good";
+}
+
 function markCard(needsReview) {
   if (!requireFlashTrial()) return;
   const card = state.deck[state.index];
@@ -204,6 +224,7 @@ function markCard(needsReview) {
   }
 
   if (state.index < state.deck.length - 1) state.index += 1;
+  autoClaimDailyCheckin();
   saveState();
   renderStats();
   renderReviewList();
@@ -222,13 +243,13 @@ function canAdvanceFlashCard() {
 }
 
 function claimReward() {
-  const result = claimDailyReward(state.accountPoints, !!state.claimedDays[state.todayKey], 40);
+  const result = claimDailyReward(state.accountPoints, !!state.claimedDays[state.todayKey], 1);
   checkinMsgEl.textContent = result.message;
   checkinMsgEl.className = result.ok ? "feedback good" : "feedback bad";
   if (result.ok) {
     state.accountPoints = result.points;
     state.claimedDays[state.todayKey] = true;
-    claimRewardEl.classList.add("hidden");
+    if (claimRewardEl) claimRewardEl.classList.add("hidden");
     saveState();
     renderStats();
   }
@@ -251,7 +272,7 @@ document.getElementById("nextCard").addEventListener("click", () => {
     renderCard();
   }
 });
-claimRewardEl.addEventListener("click", claimReward);
+if (claimRewardEl) claimRewardEl.addEventListener("click", claimReward);
 
 document.getElementById("flipCard").addEventListener("click", () => {
   if (!flashCardEl) return;
@@ -261,8 +282,10 @@ document.getElementById("flipCard").addEventListener("click", () => {
 
   if (flashCardEl.classList.contains("flipped")) {
     showWordImage(card.word);
+    if (flashTagsEl) flashTagsEl.classList.remove("hidden");
   } else {
     hideWordImage();
+    if (flashTagsEl) flashTagsEl.classList.add("hidden");
   }
 });
 
