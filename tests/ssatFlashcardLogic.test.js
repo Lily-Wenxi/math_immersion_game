@@ -7,6 +7,9 @@ const {
   normalizeWord,
   claimDailyReward,
   getComicScene,
+  toWordSlug,
+  getWordImageCandidates,
+  buildWordNameVariants,
 } = require('../ssatFlashcardLogic');
 const { getWordBank } = require('../ssatVocabData');
 
@@ -45,4 +48,29 @@ test('getComicScene returns expected shape', () => {
   assert.ok(scene.bg);
   assert.ok(scene.emoji);
   assert.ok(scene.prop);
+});
+
+
+test('toWordSlug normalizes word into filename slug', () => {
+  assert.equal(toWordSlug('Word Power!'), 'word-power');
+});
+
+test('getWordImageCandidates builds image paths by word name', () => {
+  const candidates = getWordImageCandidates('Tentative');
+  assert.equal(candidates[0], 'assets/flashcards/tentative.png');
+  assert.equal(candidates.length, 10);
+});
+
+
+test('buildWordNameVariants includes slug and common filename variants', () => {
+  const variants = buildWordNameVariants('Word Power');
+  assert.ok(variants.includes('word-power'));
+  assert.ok(variants.includes('wordpower'));
+  assert.ok(variants.includes('word_power'));
+});
+
+test('getWordImageCandidates checks both assets/flashcards and flashcards folders', () => {
+  const candidates = getWordImageCandidates('Tentative');
+  assert.ok(candidates.includes('assets/flashcards/tentative.png'));
+  assert.ok(candidates.includes('flashcards/tentative.png'));
 });

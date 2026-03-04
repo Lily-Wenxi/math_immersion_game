@@ -1,5 +1,6 @@
 const { getWordBank } = window.SSATVocabData;
 const { createQuestion } = window.SSATVocabLogic;
+const Auth = window.Auth;
 
 const STORAGE_KEY = "ssatVocabNotebook";
 const STATS_KEY = "ssatVocabStats";
@@ -154,8 +155,21 @@ function newQuestion() {
   });
 }
 
+
+function requireVocabTrial() {
+  if (!Auth || Auth.isLoggedIn()) return true;
+  const result = Auth.consumeGuestTrial("vocab", 1);
+  if (!result.ok) {
+    feedbackEl.innerHTML = 'Trial finished: new users can try one vocabulary question for free. <a href="auth.html">Register / Login</a>';
+    feedbackEl.className = "feedback bad";
+    return false;
+  }
+  return true;
+}
+
 function submitAnswer(choice) {
   if (!state.currentQuestion) return;
+  if (!requireVocabTrial()) return;
   state.stats.total += 1;
 
   if (choice === state.currentQuestion.answer) {

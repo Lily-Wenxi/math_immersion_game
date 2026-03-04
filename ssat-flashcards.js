@@ -1,6 +1,7 @@
 const { getWordBank } = window.SSATVocabData;
 const { getDeck } = window.SSATFlashcardDeck || { getDeck: null };
-const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward, getComicScene } = window.SSATFlashcardLogic;
+const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward, getWordImageCandidates } = window.SSATFlashcardLogic;
+const Auth = window.Auth;
 
 const FLASHCARD_KEY = "ssatFlashcardDaily";
 const ACCOUNT_KEY = "ssatAccountPoints";
@@ -13,7 +14,6 @@ const state = {
   reviewed: {},
   reviewWords: [],
   claimedDays: {},
-  mode: "classic",
 };
 
 const todayKeyEl = document.getElementById("todayKey");
@@ -26,14 +26,13 @@ const flashMeaningEl = document.getElementById("flashMeaning");
 const flashUsageEl = document.getElementById("flashUsage");
 const flashSynonymEl = document.getElementById("flashSynonym");
 const flashAntonymEl = document.getElementById("flashAntonym");
-const comicStripEl = document.getElementById("comicStrip");
-const comicArtEl = document.getElementById("comicArt");
-const mwLinkEl = document.getElementById("mwLink");
+const flashImageWrapEl = document.getElementById("flashImageWrap");
+const flashImageEl = document.getElementById("flashImage");
+const flashImageCaptionEl = document.getElementById("flashImageCaption");
 const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
-const studyModeClassicEl = document.getElementById("studyModeClassic");
-const studyModeComicEl = document.getElementById("studyModeComic");
+const accountEntryLinkEl = document.getElementById("accountEntryLink");
 
 function loadState() {
   const account = Number(localStorage.getItem(ACCOUNT_KEY) || 0);
@@ -76,6 +75,19 @@ function getReviewedCount() {
   return Object.keys(state.reviewed).length;
 }
 
+
+function renderAccountEntry() {
+  if (!accountEntryLinkEl) return;
+  const currentUser = Auth && typeof Auth.getCurrentUser === "function" ? Auth.getCurrentUser() : null;
+  if (currentUser && currentUser.username) {
+    accountEntryLinkEl.textContent = `Hi, ${currentUser.username}`;
+    accountEntryLinkEl.href = "auth.html";
+    return;
+  }
+  accountEntryLinkEl.textContent = "Account Login / Register →";
+  accountEntryLinkEl.href = "auth.html";
+}
+
 function renderStats() {
   todayKeyEl.textContent = state.todayKey;
   reviewedCountEl.textContent = getReviewedCount();
@@ -99,92 +111,58 @@ function renderReviewList() {
 }
 
 
-function escapeXml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+function hideWordImage() {
+  if (flashImageWrapEl) flashImageWrapEl.classList.add("hidden");
+  if (flashImageEl) {
+    flashImageEl.removeAttribute("src");
+    flashImageEl.onerror = null;
+    flashImageEl.onload = null;
+    flashImageEl.style.width = "";
+    flashImageEl.style.height = "";
+  }
+  if (flashImageCaptionEl) flashImageCaptionEl.textContent = "";
 }
 
+function showWordImage(word) {
+  if (!flashImageWrapEl || !flashImageEl) return;
 
-function renderTentativeComic() {
-  if (!comicArtEl) return;
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='700' viewBox='0 0 1000 700'>
-    <rect width='1000' height='700' fill='#dfeeff'/>
-    <text x='500' y='58' text-anchor='middle' font-size='56' font-family='Arial' font-weight='700' fill='#1f3f86'>What is TENTATIVE?</text>
-
-    <rect x='40' y='100' width='440' height='250' rx='16' fill='#fff8ef' stroke='#2d5ca5' stroke-width='6'/>
-    <rect x='60' y='118' width='230' height='46' rx='10' fill='#ef6b2e'/>
-    <text x='175' y='150' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>NOT CERTAIN</text>
-    <text x='70' y='225' font-size='28' fill='#223' font-family='Arial'>Maybe beach… maybe mountains…</text>
-    <text x='70' y='262' font-size='28' fill='#223' font-family='Arial'>I am still deciding.</text>
-
-    <rect x='520' y='100' width='440' height='250' rx='16' fill='#fff3ff' stroke='#2d5ca5' stroke-width='6'/>
-    <rect x='540' y='118' width='280' height='46' rx='10' fill='#6f4ebf'/>
-    <text x='680' y='150' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>UNSURE / HESITANT</text>
-    <text x='550' y='225' font-size='28' fill='#223' font-family='Arial'>Should I step forward?</text>
-    <text x='550' y='262' font-size='28' fill='#223' font-family='Arial'>I'm not fully sure yet.</text>
-
-    <rect x='40' y='380' width='440' height='250' rx='16' fill='#f3fff1' stroke='#2d5ca5' stroke-width='6'/>
-    <rect x='60' y='398' width='240' height='46' rx='10' fill='#3a9d43'/>
-    <text x='180' y='430' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>JUST TESTING</text>
-    <text x='70' y='505' font-size='28' fill='#223' font-family='Arial'>I’ll try a little first…</text>
-    <text x='70' y='542' font-size='28' fill='#223' font-family='Arial'>to see if it works.</text>
-
-    <rect x='520' y='380' width='440' height='250' rx='16' fill='#fff5ec' stroke='#2d5ca5' stroke-width='6'/>
-    <rect x='540' y='398' width='220' height='46' rx='10' fill='#d9573b'/>
-    <text x='650' y='430' text-anchor='middle' font-size='34' fill='#fff' font-family='Arial' font-weight='700'>NOT FINAL</text>
-    <text x='550' y='505' font-size='28' fill='#223' font-family='Arial'>This is a tentative plan.</text>
-    <text x='550' y='542' font-size='28' fill='#223' font-family='Arial'>It can still change later.</text>
-
-    <text x='500' y='680' text-anchor='middle' font-size='40' font-family='Arial' font-weight='700' fill='#16366f'>Tentative = uncertain, cautious, not final.</text>
-  </svg>`;
-  comicArtEl.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
-function renderComicArt(card) {
-  if (!comicArtEl) return;
-  if (String(card.word || "").toLowerCase() === "tentative") {
-    renderTentativeComic();
+  const candidates = getWordImageCandidates(word);
+  if (!candidates.length) {
+    hideWordImage();
     return;
   }
 
-  const p1 = escapeXml(card.comicPanels[0] || "");
-  const p2 = escapeXml(card.comicPanels[1] || "");
-  const p3 = escapeXml(card.comicPanels[2] || "");
-  const scene = typeof getComicScene === "function" ? getComicScene(card) : { bg: "#f4f7ff", mood: "neutral", emoji: "🧠", prop: "💬" };
-  const eye = scene.mood === "happy" ? "◕" : scene.mood === "tense" ? "•" : "◔";
-  const mouth = scene.mood === "happy" ? "◡" : scene.mood === "tense" ? "︿" : "—";
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1000' height='300' viewBox='0 0 1000 300'>
-    <rect x='0' y='0' width='1000' height='300' rx='20' fill='${scene.bg}'/>
-    <text x='20' y='28' font-size='22'>${scene.emoji}</text>
-    <text x='960' y='28' font-size='22'>${scene.prop}</text>
-    <rect x='16' y='16' width='310' height='268' rx='12' fill='#fff'/><rect x='344' y='16' width='310' height='268' rx='12' fill='#fff'/><rect x='672' y='16' width='312' height='268' rx='12' fill='#fff'/>
-    <circle cx='70' cy='170' r='26' fill='#ffd9b3'/><text x='58' y='176' font-size='16'>${eye}${eye}</text><text x='64' y='190' font-size='16'>${mouth}</text><rect x='54' y='198' width='32' height='56' rx='8' fill='#91b6ff'/>
-    <circle cx='400' cy='170' r='26' fill='#ffd9b3'/><text x='388' y='176' font-size='16'>${eye}${eye}</text><text x='394' y='190' font-size='16'>${mouth}</text><rect x='384' y='198' width='32' height='56' rx='8' fill='#90d7b4'/>
-    <circle cx='728' cy='170' r='26' fill='#ffd9b3'/><text x='716' y='176' font-size='16'>${eye}${eye}</text><text x='722' y='190' font-size='16'>${mouth}</text><rect x='712' y='198' width='32' height='56' rx='8' fill='#ffb4cb'/>
-    <rect x='110' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='120' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p1}</text>
-    <rect x='438' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='448' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p2}</text>
-    <rect x='766' y='42' width='196' height='84' rx='12' fill='#eef3ff'/><text x='776' y='68' font-size='16' font-family='Arial' fill='#2d3768'>${p3}</text>
-  </svg>`;
-  comicArtEl.src = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
+  let idx = 0;
+  const tryNext = () => {
+    if (idx >= candidates.length) {
+      hideWordImage();
+      return;
+    }
+    flashImageEl.onerror = () => {
+      idx += 1;
+      tryNext();
+    };
+    flashImageEl.onload = () => {
+      const halfWidth = Math.max(1, Math.round(flashImageEl.naturalWidth / 2));
+      const halfHeight = Math.max(1, Math.round(flashImageEl.naturalHeight / 2));
+      flashImageEl.style.width = `${halfWidth}px`;
+      flashImageEl.style.height = `${halfHeight}px`;
+    };
+    flashImageEl.src = candidates[idx];
+  };
 
-
-function renderModeUI() {
-  const isComic = state.mode === "comic";
-  if (studyModeClassicEl) studyModeClassicEl.classList.toggle("active-mode", !isComic);
-  if (studyModeComicEl) studyModeComicEl.classList.toggle("active-mode", isComic);
-  if (comicArtEl) comicArtEl.classList.toggle("hidden", !isComic);
-  if (comicStripEl) comicStripEl.classList.toggle("hidden", !isComic);
+  flashImageEl.onerror = null;
+  flashImageEl.onload = null;
+  tryNext();
+  flashImageWrapEl.classList.remove("hidden");
+  if (flashImageCaptionEl) flashImageCaptionEl.textContent = `Image: ${word}`;
 }
 
 function renderCard() {
   const card = state.deck[state.index];
   if (!card) return;
   if (flashCardEl) flashCardEl.classList.remove("flipped");
+  hideWordImage();
 
   flashWordEl.textContent = card.word;
   if (flashWordBackEl) flashWordBackEl.textContent = card.word;
@@ -192,18 +170,6 @@ function renderCard() {
   flashUsageEl.textContent = `Usage: ${card.usage}`;
   flashSynonymEl.textContent = card.synonym;
   flashAntonymEl.textContent = card.antonym;
-  comicStripEl.innerHTML = "";
-  if (mwLinkEl) mwLinkEl.href = card.dictionaryUrl || `https://www.merriam-webster.com/dictionary/${encodeURIComponent(card.word)}`;
-  renderComicArt(card);
-
-  card.comicPanels.forEach((panel, idx) => {
-    const div = document.createElement("div");
-    div.className = "comic-panel";
-    div.innerHTML = `<strong>Panel ${idx + 1}</strong><p>${panel}</p>`;
-    comicStripEl.appendChild(div);
-  });
-
-  renderModeUI();
 
   const reviewedDone = getReviewedCount() >= state.deck.length;
   const claimed = !!state.claimedDays[state.todayKey];
@@ -214,7 +180,20 @@ function renderCard() {
   }
 }
 
+
+function requireFlashTrial() {
+  if (!Auth || Auth.isLoggedIn()) return true;
+  const result = Auth.consumeGuestTrial("flash", 3);
+  if (!result.ok) {
+    checkinMsgEl.innerHTML = 'Trial finished: new users can review up to 3 flash cards for free. <a href="auth.html">Register / Login</a>';
+    checkinMsgEl.className = "feedback bad";
+    return false;
+  }
+  return true;
+}
+
 function markCard(needsReview) {
+  if (!requireFlashTrial()) return;
   const card = state.deck[state.index];
   if (!card) return;
   if (flashCardEl) flashCardEl.classList.remove("flipped");
@@ -229,6 +208,17 @@ function markCard(needsReview) {
   renderStats();
   renderReviewList();
   renderCard();
+}
+
+
+function canAdvanceFlashCard() {
+  if (!Auth || Auth.isLoggedIn()) return true;
+  if (state.index >= 2) {
+    checkinMsgEl.innerHTML = 'Trial finished: guests can preview up to 3 flash cards. <a href="auth.html">Register / Login</a>';
+    checkinMsgEl.className = "feedback bad";
+    return false;
+  }
+  return true;
 }
 
 function claimReward() {
@@ -246,7 +236,15 @@ function claimReward() {
 
 document.getElementById("knowBtn").addEventListener("click", () => markCard(false));
 document.getElementById("reviewBtn").addEventListener("click", () => markCard(true));
+document.getElementById("prevCard").addEventListener("click", () => {
+  if (state.index > 0) {
+    state.index -= 1;
+    saveState();
+    renderCard();
+  }
+});
 document.getElementById("nextCard").addEventListener("click", () => {
+  if (!canAdvanceFlashCard()) return;
   if (state.index < state.deck.length - 1) {
     state.index += 1;
     saveState();
@@ -254,22 +252,22 @@ document.getElementById("nextCard").addEventListener("click", () => {
   }
 });
 claimRewardEl.addEventListener("click", claimReward);
-studyModeClassicEl.addEventListener("click", () => {
-  state.mode = "classic";
-  renderModeUI();
-});
-studyModeComicEl.addEventListener("click", () => {
-  state.mode = "comic";
-  renderModeUI();
-});
 
 document.getElementById("flipCard").addEventListener("click", () => {
   if (!flashCardEl) return;
   flashCardEl.classList.toggle("flipped");
+  const card = state.deck[state.index];
+  if (!card) return;
+
+  if (flashCardEl.classList.contains("flipped")) {
+    showWordImage(card.word);
+  } else {
+    hideWordImage();
+  }
 });
 
 loadState();
+renderAccountEntry();
 renderStats();
 renderReviewList();
-renderModeUI();
 renderCard();
