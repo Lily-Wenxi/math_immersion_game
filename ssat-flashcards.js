@@ -32,6 +32,7 @@ const flashImageCaptionEl = document.getElementById("flashImageCaption");
 const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
+const accountEntryLinkEl = document.getElementById("accountEntryLink");
 
 function loadState() {
   const account = Number(localStorage.getItem(ACCOUNT_KEY) || 0);
@@ -72,6 +73,19 @@ function saveState() {
 
 function getReviewedCount() {
   return Object.keys(state.reviewed).length;
+}
+
+
+function renderAccountEntry() {
+  if (!accountEntryLinkEl) return;
+  const currentUser = Auth && typeof Auth.getCurrentUser === "function" ? Auth.getCurrentUser() : null;
+  if (currentUser && currentUser.username) {
+    accountEntryLinkEl.textContent = `Hi, ${currentUser.username}`;
+    accountEntryLinkEl.href = "auth.html";
+    return;
+  }
+  accountEntryLinkEl.textContent = "Account Login / Register →";
+  accountEntryLinkEl.href = "auth.html";
 }
 
 function renderStats() {
@@ -253,6 +267,7 @@ document.getElementById("flipCard").addEventListener("click", () => {
 });
 
 loadState();
+renderAccountEntry();
 renderStats();
 renderReviewList();
 renderCard();
