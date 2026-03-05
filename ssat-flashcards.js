@@ -125,19 +125,44 @@ function hideWordImage() {
   if (flashImageCaptionEl) flashImageCaptionEl.textContent = "";
 }
 
+
+function makeFallbackSvgDataUri(word) {
+  const safeWord = String(word || "word")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .slice(0, 32);
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360"><rect width="640" height="360" fill="#f5f8ff"/><rect x="24" y="24" width="592" height="312" rx="20" fill="#ffffff" stroke="#cfd8ff" stroke-width="4"/><text x="320" y="130" text-anchor="middle" font-size="44" font-family="Arial" fill="#5c69d9">${safeWord}</text><text x="320" y="190" text-anchor="middle" font-size="24" font-family="Arial" fill="#6a7198">Image preview</text><text x="320" y="245" text-anchor="middle" font-size="44">📘✨</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function showGeneratedWordImage(word) {
+  if (!flashImageWrapEl || !flashImageEl) return;
+  flashImageEl.onerror = null;
+  flashImageEl.onload = () => {
+    const halfWidth = Math.max(1, Math.round(flashImageEl.naturalWidth / 2));
+    const halfHeight = Math.max(1, Math.round(flashImageEl.naturalHeight / 2));
+    flashImageEl.style.width = `${halfWidth}px`;
+    flashImageEl.style.height = `${halfHeight}px`;
+  };
+  flashImageEl.src = makeFallbackSvgDataUri(word);
+  flashImageWrapEl.classList.remove("hidden");
+  if (flashImageCaptionEl) flashImageCaptionEl.textContent = `Image: ${word} (generated)`;
+}
+
 function showWordImage(word) {
   if (!flashImageWrapEl || !flashImageEl) return;
 
   const candidates = getWordImageCandidates(word);
   if (!candidates.length) {
-    hideWordImage();
+    showGeneratedWordImage(word);
     return;
   }
 
   let idx = 0;
   const tryNext = () => {
     if (idx >= candidates.length) {
-      hideWordImage();
+      showGeneratedWordImage(word);
       return;
     }
     flashImageEl.onerror = () => {
