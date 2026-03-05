@@ -33,7 +33,7 @@ const flashImageCaptionEl = document.getElementById("flashImageCaption");
 const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
-const speakWordBtnEl = document.getElementById("speakWord");
+const speakWordBtnEls = document.querySelectorAll(".speak-word-btn");
 const accountEntryLinkEl = document.getElementById("accountEntryLink");
 
 function loadState() {
@@ -301,7 +301,7 @@ document.getElementById("nextCard").addEventListener("click", () => {
   }
 });
 if (claimRewardEl) claimRewardEl.addEventListener("click", claimReward);
-if (speakWordBtnEl) speakWordBtnEl.addEventListener("click", pronounceCurrentWord);
+speakWordBtnEls.forEach((btn) => btn.addEventListener("click", pronounceCurrentWord));
 
 document.getElementById("flipCard").addEventListener("click", () => {
   if (!flashCardEl) return;

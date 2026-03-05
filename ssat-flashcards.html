@@ -25,12 +25,15 @@
           <div class="flash-face flash-front">
             <div class="flash-word-row">
               <h2 id="flashWord">Word</h2>
-              <button id="speakWord" class="secondary speak-btn" type="button" aria-label="Pronounce current word">🔊</button>
+              <button class="secondary speak-btn speak-word-btn" type="button" aria-label="Pronounce current word">🔊</button>
             </div>
             <p class="muted">Think of the meaning before flipping.</p>
           </div>
           <div class="flash-face flash-back">
-            <h2 id="flashWordBack">Meaning & Usage</h2>
+            <div class="flash-word-row">
+              <h2 id="flashWordBack">Meaning & Usage</h2>
+              <button class="secondary speak-btn speak-word-btn" type="button" aria-label="Pronounce current word">🔊</button>
+            </div>
             <p id="flashMeaning" class="story"></p>
             <p id="flashUsage" class="muted"></p>
             <figure id="flashImageWrap" class="flash-image-wrap hidden" aria-live="polite">
