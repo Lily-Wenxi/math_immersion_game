@@ -611,12 +611,16 @@ footer {
 .flash-word-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
+  justify-content: flex-start;
+  gap: 2ch;
+}
+
+.flash-word-row h2 {
+  margin: 0;
 }
 
 .speak-btn {
-  padding: 0.35rem 0.55rem;
+  padding: 0.2rem 0.35rem;
   min-width: auto;
   line-height: 1;
 }
