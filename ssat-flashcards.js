@@ -22,11 +22,8 @@ const accountPointsEl = document.getElementById("accountPoints");
 const flashWordEl = document.getElementById("flashWord");
 const flashCardEl = document.getElementById("flashCard");
 const flashWordBackEl = document.getElementById("flashWordBack");
-const flashMeaningEl = document.getElementById("flashMeaning");
-const flashUsageEl = document.getElementById("flashUsage");
 const flashSynonymEl = document.getElementById("flashSynonym");
 const flashAntonymEl = document.getElementById("flashAntonym");
-const flashTagsEl = document.getElementById("flashTags");
 const flashImageWrapEl = document.getElementById("flashImageWrap");
 const flashImageEl = document.getElementById("flashImage");
 const flashImageCaptionEl = document.getElementById("flashImageCaption");
@@ -217,12 +214,9 @@ function renderCard() {
   if (!card) return;
   if (flashCardEl) flashCardEl.classList.remove("flipped");
   hideWordImage();
-  if (flashTagsEl) flashTagsEl.classList.add("hidden");
 
   flashWordEl.textContent = card.word;
   if (flashWordBackEl) flashWordBackEl.textContent = card.word;
-  flashMeaningEl.textContent = `Meaning: ${card.definition}`;
-  flashUsageEl.textContent = `Usage: ${card.usage}`;
   flashSynonymEl.textContent = card.synonym;
   flashAntonymEl.textContent = card.antonym;
 
@@ -336,11 +330,9 @@ document.getElementById("flipCard").addEventListener("click", () => {
 
   if (flashCardEl.classList.contains("flipped")) {
     showWordImage(card.word);
-    if (flashTagsEl) flashTagsEl.classList.remove("hidden");
   } else {
     hideWordImage();
-    if (flashTagsEl) flashTagsEl.classList.add("hidden");
-  }
+    }
 });
 
 loadState();
