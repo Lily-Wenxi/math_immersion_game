@@ -607,3 +607,16 @@ footer {
   padding: 0.7rem;
   background: #faf5ff;
 }
+
+.flash-word-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.speak-btn {
+  padding: 0.35rem 0.55rem;
+  min-width: auto;
+  line-height: 1;
+}

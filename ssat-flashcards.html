@@ -23,7 +23,10 @@
       <section class="panel">
         <div id="flashCard" class="flash-card">
           <div class="flash-face flash-front">
-            <h2 id="flashWord">Word</h2>
+            <div class="flash-word-row">
+              <h2 id="flashWord">Word</h2>
+              <button id="speakWord" class="secondary speak-btn" type="button" aria-label="Pronounce current word">🔊</button>
+            </div>
             <p class="muted">Think of the meaning before flipping.</p>
           </div>
           <div class="flash-face flash-back">
@@ -46,7 +49,6 @@
           <button id="knowBtn">I remember this</button>
           <button id="reviewBtn" class="secondary">Need review</button>
           <button id="flipCard" class="secondary">Flip card</button>
-          <button id="speakWord" class="secondary">🔊 Pronounce</button>
           <button id="prevCard" class="secondary">Previous card</button>
           <button id="nextCard">Next card</button>
         </div>
