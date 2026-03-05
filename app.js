@@ -1,4 +1,6 @@
 const STORAGE_PREFIX = "mathImmersionGrade";
+const ACCOUNT_POINTS_KEY = "mathImmersionAccountPoints";
+const LEGACY_FLASH_POINTS_KEY = "ssatAccountPoints";
 
 const { isAnswerCorrect } = window.GameLogic;
 const { generateQuestionsByTopic } = window.Reinforcement;
@@ -155,17 +157,33 @@ function resetTransientUI() {
 
 function loadState() {
   const raw = localStorage.getItem(storageKey());
-  if (!raw) return;
-  try {
-    const parsed = JSON.parse(raw);
-    state.unlockedLevel = Math.max(1, parsed.unlockedLevel || 1);
-    state.score = parsed.score || 0;
-    state.completed = Array.isArray(parsed.completed) ? parsed.completed : [];
-    state.mistakes = Array.isArray(parsed.mistakes) ? parsed.mistakes : [];
-    state.masteredTopics = Array.isArray(parsed.masteredTopics) ? parsed.masteredTopics : [];
-    state.ownedEquipment = Array.isArray(parsed.ownedEquipment) ? parsed.ownedEquipment : [];
-  } catch {
-    localStorage.removeItem(storageKey());
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      state.unlockedLevel = Math.max(1, parsed.unlockedLevel || 1);
+      state.score = parsed.score || 0;
+      state.completed = Array.isArray(parsed.completed) ? parsed.completed : [];
+      state.mistakes = Array.isArray(parsed.mistakes) ? parsed.mistakes : [];
+      state.masteredTopics = Array.isArray(parsed.masteredTopics) ? parsed.masteredTopics : [];
+      state.ownedEquipment = Array.isArray(parsed.ownedEquipment) ? parsed.ownedEquipment : [];
+    } catch {
+      localStorage.removeItem(storageKey());
+    }
+  }
+
+  const accountPointsRaw = localStorage.getItem(ACCOUNT_POINTS_KEY);
+  const accountPoints = Number(accountPointsRaw);
+  if (Number.isFinite(accountPoints)) {
+    state.score = accountPoints;
+    return;
+  }
+
+  const legacyFlashPoints = Number(localStorage.getItem(LEGACY_FLASH_POINTS_KEY));
+  if (Number.isFinite(legacyFlashPoints)) {
+    state.score = legacyFlashPoints;
+    localStorage.setItem(ACCOUNT_POINTS_KEY, String(legacyFlashPoints));
+  } else {
+    localStorage.setItem(ACCOUNT_POINTS_KEY, String(state.score));
   }
 }
 
@@ -181,6 +199,8 @@ function saveState() {
       ownedEquipment: state.ownedEquipment,
     })
   );
+  localStorage.setItem(ACCOUNT_POINTS_KEY, String(state.score));
+  localStorage.setItem(LEGACY_FLASH_POINTS_KEY, String(state.score));
 }
 
 function renderStats() {
@@ -472,6 +492,8 @@ function resetProgress() {
   state.masteredTopics = [];
   state.ownedEquipment = [];
   localStorage.removeItem(storageKey());
+  localStorage.setItem(ACCOUNT_POINTS_KEY, "0");
+  localStorage.setItem(LEGACY_FLASH_POINTS_KEY, "0");
   resetTransientUI();
   renderStats();
   renderLevels();

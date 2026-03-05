@@ -4,7 +4,8 @@ const { getTodayKey, buildDailyDeck, normalizeWord, claimDailyReward, getWordIma
 const Auth = window.Auth;
 
 const FLASHCARD_KEY = "ssatFlashcardDaily";
-const ACCOUNT_KEY = "ssatAccountPoints";
+const ACCOUNT_KEY = "mathImmersionAccountPoints";
+const LEGACY_ACCOUNT_KEY = "ssatAccountPoints";
 
 const state = {
   todayKey: getTodayKey(),
@@ -33,8 +34,16 @@ const speakWordBtnEls = document.querySelectorAll(".speak-word-btn");
 const accountEntryLinkEl = document.getElementById("accountEntryLink");
 
 function loadState() {
-  const account = Number(localStorage.getItem(ACCOUNT_KEY) || 0);
-  state.accountPoints = Number.isFinite(account) ? account : 0;
+  const account = Number(localStorage.getItem(ACCOUNT_KEY));
+  const legacyAccount = Number(localStorage.getItem(LEGACY_ACCOUNT_KEY));
+  if (Number.isFinite(account)) {
+    state.accountPoints = account;
+  } else if (Number.isFinite(legacyAccount)) {
+    state.accountPoints = legacyAccount;
+    localStorage.setItem(ACCOUNT_KEY, String(legacyAccount));
+  } else {
+    state.accountPoints = 0;
+  }
 
   try {
     const raw = JSON.parse(localStorage.getItem(FLASHCARD_KEY) || "{}");
@@ -57,6 +66,7 @@ function loadState() {
 
 function saveState() {
   localStorage.setItem(ACCOUNT_KEY, String(state.accountPoints));
+  localStorage.setItem(LEGACY_ACCOUNT_KEY, String(state.accountPoints));
   localStorage.setItem(
     FLASHCARD_KEY,
     JSON.stringify({
