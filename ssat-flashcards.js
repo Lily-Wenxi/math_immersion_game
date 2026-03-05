@@ -26,7 +26,6 @@ const flashSynonymEl = document.getElementById("flashSynonym");
 const flashAntonymEl = document.getElementById("flashAntonym");
 const flashImageWrapEl = document.getElementById("flashImageWrap");
 const flashImageEl = document.getElementById("flashImage");
-const flashImageCaptionEl = document.getElementById("flashImageCaption");
 const reviewListEl = document.getElementById("reviewList");
 const checkinMsgEl = document.getElementById("checkinMsg");
 const claimRewardEl = document.getElementById("claimReward");
@@ -119,7 +118,6 @@ function hideWordImage() {
     flashImageEl.style.width = "";
     flashImageEl.style.height = "";
   }
-  if (flashImageCaptionEl) flashImageCaptionEl.textContent = "";
 }
 
 
@@ -144,7 +142,6 @@ function showGeneratedWordImage(word) {
   };
   flashImageEl.src = makeFallbackSvgDataUri(word);
   flashImageWrapEl.classList.remove("hidden");
-  if (flashImageCaptionEl) flashImageCaptionEl.textContent = `Image: ${word} (generated)`;
 }
 
 function showWordImage(word) {
@@ -179,7 +176,6 @@ function showWordImage(word) {
   flashImageEl.onload = null;
   tryNext();
   flashImageWrapEl.classList.remove("hidden");
-  if (flashImageCaptionEl) flashImageCaptionEl.textContent = `Image: ${word}`;
 }
 
 
