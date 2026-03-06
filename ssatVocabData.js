@@ -156,8 +156,42 @@
     { word: "yield", definition: "to produce or give way", synonym: "produce" }
   ];
 
+
+
+  const USER_SUBMITTED_WORDS = [
+    { word: "unabundant", definition: "not abundant", synonym: "brave", antonym: "slow" },
+    { word: "abundantly", definition: "in an abundant way", synonym: "careful", antonym: "dull" },
+    { word: "abundantness", definition: "the state of being abundant", synonym: "calm", antonym: "unclear" },
+    { word: "reabundant", definition: "abundant again", synonym: "creative", antonym: "harmful" },
+    { word: "preabundant", definition: "existing before abundance", synonym: "calm", antonym: "harmful" },
+    { word: "postabundant", definition: "happening after abundance", synonym: "creative", antonym: "harmful" },
+    { word: "antiabundant", definition: "against abundance", synonym: "helpful", antonym: "weak" },
+    { word: "nonabundant", definition: "not abundant", synonym: "helpful", antonym: "lazy" },
+    { word: "superabundant", definition: "more than abundant", synonym: "brave", antonym: "harmful" },
+    { word: "accurate", definition: "correct and exact", synonym: "careful", antonym: "harmful" },
+    { word: "unaccurate", definition: "not accurate", synonym: "strong", antonym: "minor" },
+    { word: "accurately", definition: "in an accurate way", synonym: "important", antonym: "lazy" },
+    { word: "accurateness", definition: "the quality of being accurate", synonym: "careful", antonym: "lazy" },
+    { word: "reaccurate", definition: "accurate again", synonym: "brave", antonym: "confused" },
+    { word: "preaccurate", definition: "before becoming accurate", synonym: "calm", antonym: "confused" },
+    { word: "postaccurate", definition: "after becoming accurate", synonym: "smart", antonym: "weak" },
+    { word: "antiaccurate", definition: "against accuracy", synonym: "careful", antonym: "minor" },
+    { word: "nonaccurate", definition: "not accurate", synonym: "calm", antonym: "minor" },
+    { word: "superaccurate", definition: "extremely accurate", synonym: "smart", antonym: "careless" },
+    { word: "unadapt", definition: "to fail to adapt", synonym: "calm", antonym: "harmful" },
+    { word: "adaptly", definition: "in an adaptive manner", synonym: "careful", antonym: "slow" },
+    { word: "adaptness", definition: "the ability to adapt", synonym: "helpful", antonym: "fragile" },
+    { word: "readapt", definition: "to adapt again", synonym: "helpful", antonym: "slow" },
+    { word: "preadapt", definition: "to adapt in advance", synonym: "calm", antonym: "slow" },
+    { word: "postadapt", definition: "to adapt afterward", synonym: "quick", antonym: "harmful" },
+    { word: "antiadapt", definition: "to oppose adaptation", synonym: "important", antonym: "harmful" },
+    { word: "nonadapt", definition: "to not adapt", synonym: "smart", antonym: "minor" },
+    { word: "superadapt", definition: "to adapt extremely well", synonym: "calm", antonym: "lazy" },
+    { word: "admire", definition: "to regard with respect", synonym: "careful", antonym: "minor" }
+  ];
+
   const TARGET_WORD_COUNT = 2500;
-  const PREFIXES = ["re", "un", "pre", "inter", "non", "over", "under", "sub", "super", "anti", "pro"];
+  const PREFIXES = ["re", "un", "pre", "post", "inter", "non", "over", "under", "sub", "super", "anti", "pro"];
   const SUFFIXES = ["ly", "ness", "ment", "tion", "s", "er", "ing", "ed", "al", "ity", "ive", "ous", "able"];
 
   function canUseWord(word) {
@@ -167,7 +201,10 @@
   function buildExpandedWordBank() {
     const map = new Map();
     SSAT_WORD_BANK.forEach((entry) => map.set(entry.word, { ...entry, generated: false }));
-    const roots = SSAT_WORD_BANK.map((entry) => entry.word);
+    USER_SUBMITTED_WORDS.forEach((entry) => {
+      if (!map.has(entry.word)) map.set(entry.word, { ...entry, generated: false });
+    });
+    const roots = [...map.keys()];
 
     for (const root of roots) {
       for (const prefix of PREFIXES) {
